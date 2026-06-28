@@ -1,11 +1,10 @@
+import "./Sidebar.css";
+
 import { logout } from "../auth";
 
 function handleLogout() {
-
     logout();
-
     window.location.href = "/login";
-
 }
 
 type Props = {
@@ -29,39 +28,34 @@ export default function Sidebar({
 
     return (
 
-        <div
-            style={{
-                width: 220,
-                borderRight: "1px solid black",
-                padding: 20,
-            }}
-        >
+        <div className="sidebar">
 
-            <h2>TrustAI</h2>
+            <div className="sidebar-title">
+                TrustAI
+            </div>
 
-            <hr />
+            <div className="sidebar-menu">
 
-            {items.map((item) => (
-
-                <div
-                    key={item}
-                    style={{
-                        marginTop: 10,
-                    }}
-                >
+                {items.map((item) => (
 
                     <button
+                        key={item}
                         onClick={() => onChange(item)}
-                        disabled={current === item}
+                        className={
+                            current === item
+                                ? "sidebar-button active"
+                                : "sidebar-button"
+                        }
                     >
                         {item}
                     </button>
 
-                </div>
+                ))}
 
-            ))}
+            </div>
 
             <button
+                className="logout-button"
                 onClick={handleLogout}
             >
                 Logout
@@ -70,5 +64,4 @@ export default function Sidebar({
         </div>
 
     );
-
 }

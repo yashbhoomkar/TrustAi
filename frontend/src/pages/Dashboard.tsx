@@ -30,7 +30,9 @@ export default function Dashboard() {
             <div
                 style={{
                     flex: 1,
-                    padding: 30,
+                    background: "#f5f7fb",
+                    padding: "40px",
+                    overflow: "auto",
                 }}
             >
 

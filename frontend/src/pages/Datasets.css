@@ -1,0 +1,190 @@
+.datasets-page {
+
+    display: flex;
+    flex-direction: column;
+
+    gap: 30px;
+
+}
+
+.page-title {
+
+    font-size: 34px;
+
+    font-weight: 700;
+
+    color: #1f2937;
+
+    margin: 0;
+
+}
+
+.card {
+
+    background: white;
+
+    border-radius: 18px;
+
+    padding: 28px;
+
+    box-shadow: 0 2px 10px rgba(0,0,0,.06);
+
+}
+
+.card-title {
+
+    font-size: 22px;
+
+    font-weight: 600;
+
+    margin-bottom: 22px;
+
+    color: #111827;
+
+}
+
+.form-row {
+
+    display: flex;
+
+    gap: 16px;
+
+    align-items: center;
+
+    flex-wrap: wrap;
+
+}
+
+.text-input {
+
+    flex: 1;
+
+    min-width: 250px;
+
+    padding: 12px 16px;
+
+    border: 1px solid #d1d5db;
+
+    border-radius: 10px;
+
+    font-size: 15px;
+
+    outline: none;
+
+}
+
+.text-input:focus {
+
+    border-color: #5B5CEB;
+
+}
+
+.file-input {
+
+    font-size: 14px;
+
+}
+
+.primary-button {
+
+    background: #5B5CEB;
+
+    color: white;
+
+    border: none;
+
+    border-radius: 10px;
+
+    padding: 12px 22px;
+
+    cursor: pointer;
+
+    font-size: 15px;
+
+    font-weight: 600;
+
+}
+
+.primary-button:hover {
+
+    background: #4d4fd8;
+
+}
+
+.table {
+
+    width: 100%;
+
+    border-collapse: collapse;
+
+}
+
+.table th {
+
+    text-align: left;
+
+    padding: 14px;
+
+    border-bottom: 2px solid #ececec;
+
+    color: #6b7280;
+
+    font-size: 14px;
+
+}
+
+.table td {
+
+    padding: 16px 14px;
+
+    border-bottom: 1px solid #f1f1f1;
+
+}
+
+.table tr:hover {
+
+    background: #fafafa;
+
+}
+
+.link-button {
+
+    background: none;
+
+    border: none;
+
+    color: #5B5CEB;
+
+    cursor: pointer;
+
+    font-weight: 600;
+
+    padding: 0;
+
+}
+
+.delete-button {
+
+    background: none;
+
+    border: none;
+
+    color: #dc2626;
+
+    cursor: pointer;
+
+    font-weight: 600;
+
+}
+
+.mapping-select {
+
+    width: 100%;
+
+    padding: 10px;
+
+    border-radius: 8px;
+
+    border: 1px solid #d1d5db;
+
+}
