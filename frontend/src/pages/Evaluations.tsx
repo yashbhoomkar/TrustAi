@@ -52,24 +52,17 @@ export default function Evaluations() {
 
     async function loadData() {
 
-        const datasetData =
+        const datasetData = await getDatasets();
+        const metricData = await getMetrics();
+        const evaluationData = await getEvaluations();
 
-            await getDatasets();
-
-        const metricData =
-
-            await getMetrics();
-
-        const evaluationData =
-
-            await getEvaluations();
+        console.log("Datasets", datasetData);
+        console.log("Metrics", metricData);
+        console.log("Evaluations", evaluationData);
 
         setDatasets(datasetData);
-
         setMetrics(metricData);
-
         setEvaluations(evaluationData);
-
     }
 
     ///////////////////////////////////////////////////////

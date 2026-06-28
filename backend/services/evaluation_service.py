@@ -68,12 +68,16 @@ def create_new_evaluation(
 
 ):
 
+    logger.info(
+        f"Creating evaluation '{evaluation_name}'"
+    )
+
     db = SessionLocal()
 
     try:
 
         ###################################################
-        # Dataset
+        # Load Dataset
         ###################################################
 
         dataset = get_dataset(
@@ -86,11 +90,6 @@ def create_new_evaluation(
 
         )
 
-        print("=" * 60)
-        print(dataset.id)
-        print(dataset.column_mapping)
-        print("=" * 60)
-
         if dataset is None:
 
             return {
@@ -101,23 +100,29 @@ def create_new_evaluation(
 
             }
 
+        logger.info(
+
+            f"Dataset loaded ({dataset.id})"
+
+        )
+
         ###################################################
-        # Validate Column Mapping
+        # Validate Mapping
         ###################################################
 
-        if dataset.column_mapping is None:
+        if not dataset.column_mapping:
 
             return {
 
                 "status": "error",
 
-                "message": "Dataset column mapping is not configured."
+                "message": "Dataset mapping not configured"
 
             }
 
-        print(dataset.column_mapping.keys())
+        mapping = dataset.column_mapping
 
-        required = [
+        required_fields = [
 
             "User Prompt",
 
@@ -127,17 +132,9 @@ def create_new_evaluation(
 
         ]
 
-        for field in required:
+        for field in required_fields:
 
-            if (
-
-                field not in dataset.column_mapping
-
-                or
-
-                dataset.column_mapping[field] is None
-
-            ):
+            if field not in mapping.values():
 
                 return {
 
@@ -147,8 +144,14 @@ def create_new_evaluation(
 
                 }
 
+        logger.info(
+
+            "Column mapping validated"
+
+        )
+
         ###################################################
-        # Read Excel
+        # Read Workbook
         ###################################################
 
         workbook = load_workbook(
@@ -170,6 +173,12 @@ def create_new_evaluation(
         )
 
         workbook.close()
+
+        logger.info(
+
+            f"{total_rows} rows detected"
+
+        )
 
         ###################################################
         # Load Metrics
@@ -193,9 +202,9 @@ def create_new_evaluation(
 
                 return {
 
-                    "status": "error",
+                    "status":"error",
 
-                    "message": f"Metric {metric_id} not found"
+                    "message":f"Metric {metric_id} not found"
 
                 }
 
@@ -209,25 +218,25 @@ def create_new_evaluation(
 
                 "system_prompt": metric.system_prompt,
 
-                "general_instructions":
-                    metric.general_instructions,
+                "general_instructions": metric.general_instructions,
 
-                "output_type":
-                    metric.output_type,
+                "output_type": metric.output_type,
 
-                "min_value":
-                    metric.min_value,
+                "min_value": metric.min_value,
 
-                "max_value":
-                    metric.max_value,
+                "max_value": metric.max_value,
 
-                "discrete_values":
-                    metric.discrete_values,
+                "discrete_values": metric.discrete_values,
 
-                "is_default":
-                    metric.is_default
+                "is_default": metric.is_default
 
             })
+
+        logger.info(
+
+            f"{len(metric_snapshots)} metrics loaded"
+
+        )
 
         ###################################################
         # Create Evaluation
@@ -251,8 +260,14 @@ def create_new_evaluation(
 
         )
 
+        logger.info(
+
+            f"Evaluation {evaluation.id} created"
+
+        )
+
         ###################################################
-        # Create Result File
+        # Create Results File
         ###################################################
 
         results_path = (
@@ -281,10 +296,6 @@ def create_new_evaluation(
 
             )
 
-        ###################################################
-        # Update Evaluation
-        ###################################################
-
         update_evaluation(
 
             db,
@@ -311,9 +322,9 @@ def create_new_evaluation(
 
         return {
 
-            "status": "success",
+            "status":"success",
 
-            "evaluation_id": evaluation.id
+            "evaluation_id":evaluation.id
 
         }
 
@@ -321,10 +332,6 @@ def create_new_evaluation(
 
         db.close()
 
-
-###########################################################
-# Run Evaluation
-###########################################################
 
 ###########################################################
 # Run Evaluation
@@ -346,18 +353,24 @@ def run_evaluation(
 
     )
 
+    ###################################################
+    # Mark Running
+    ###################################################
+
     update_evaluation(
 
         db,
 
         evaluation,
 
-        status="running"
+        status="running",
+
+        completed_rows=0
 
     )
 
     ###################################################
-    # Read Excel
+    # Open Workbook
     ###################################################
 
     workbook = load_workbook(
@@ -378,9 +391,25 @@ def run_evaluation(
 
     )
 
+    workbook.close()
+
+    if len(rows) <= 1:
+
+        update_evaluation(
+
+            db,
+
+            evaluation,
+
+            status="completed"
+
+        )
+
+        return
+
     headers = [
 
-        str(value)
+        str(value).strip()
 
         if value is not None
 
@@ -390,15 +419,29 @@ def run_evaluation(
 
     ]
 
-    mapping = dataset.column_mapping
+    ###################################################
+    # Reverse Mapping
+    ###################################################
+
+    mapping = {}
+
+    for excel_column, field in dataset.column_mapping.items():
+
+        mapping[field] = excel_column
+
+    logger.info(
+
+        f"Resolved Mapping : {mapping}"
+
+    )
+
+    ###################################################
+    # Evaluate Rows
+    ###################################################
 
     results = []
 
-    ###################################################
-    # Evaluate Every Row
-    ###################################################
-
-    for row_number, row in enumerate(
+    for index, row in enumerate(
 
         rows[1:],
 
@@ -417,6 +460,10 @@ def run_evaluation(
             )
 
         )
+
+        ###################################################
+        # Read Values
+        ###################################################
 
         user_prompt = str(
 
@@ -454,25 +501,17 @@ def run_evaluation(
 
         )
 
-        row_result = {
+        logger.info(
 
-            "row": row_number,
+            f"Evaluating Row {index}"
 
-            "user_prompt": user_prompt,
-
-            "expected_response": expected_response,
-
-            "llm_response": llm_response,
-
-            "metrics": {}
-
-        }
+        )
 
         ###################################################
-        # Evaluate Every Metric
+        # Gemini
         ###################################################
 
-        row_result["metrics"] = evaluate_row(
+        metric_results = evaluate_row(
 
             evaluation.metrics,
 
@@ -484,14 +523,26 @@ def run_evaluation(
 
         )
 
-        results.append(
+        ###################################################
+        # Save Result
+        ###################################################
 
-            row_result
+        results.append({
 
-        )
+            "row": index,
+
+            "user_prompt": user_prompt,
+
+            "expected_response": expected_response,
+
+            "llm_response": llm_response,
+
+            "metrics": metric_results
+
+        })
 
         ###################################################
-        # Progress Update
+        # Update Progress
         ###################################################
 
         update_evaluation(
@@ -500,14 +551,12 @@ def run_evaluation(
 
             evaluation,
 
-            completed_rows=row_number
+            completed_rows=index
 
         )
 
-    workbook.close()
-
     ###################################################
-    # Save Results
+    # Save JSON
     ###################################################
 
     with open(
@@ -529,7 +578,7 @@ def run_evaluation(
         )
 
     ###################################################
-    # Finish Evaluation
+    # Finish
     ###################################################
 
     update_evaluation(
@@ -546,30 +595,24 @@ def run_evaluation(
 
     logger.info(
 
-        f"Evaluation {evaluation.id} Completed"
+        f"Evaluation {evaluation.id} completed"
 
     )
 
-    ###########################################################
+
+###########################################################
 # List Evaluations
 ###########################################################
 
-def list_all_evaluations(
-
-    user_id: int
-
-):
+def list_all_evaluations(user_id: int):
 
     db = SessionLocal()
 
     try:
 
         evaluations = get_evaluations(
-
             db,
-
             user_id
-
         )
 
         response = []
@@ -580,20 +623,15 @@ def list_all_evaluations(
 
                 "id": evaluation.id,
 
-                "evaluation_name":
-                    evaluation.evaluation_name,
+                "evaluation_name": evaluation.evaluation_name,
 
-                "status":
-                    evaluation.status,
+                "status": evaluation.status,
 
-                "total_rows":
-                    evaluation.total_rows,
+                "total_rows": evaluation.total_rows,
 
-                "completed_rows":
-                    evaluation.completed_rows,
+                "completed_rows": evaluation.completed_rows,
 
-                "created_at":
-                    str(evaluation.created_at)
+                "created_at": str(evaluation.created_at)
 
             })
 
@@ -603,7 +641,7 @@ def list_all_evaluations(
 
         db.close()
 
-    ###########################################################
+###########################################################
 # Get Evaluation
 ###########################################################
 
@@ -633,59 +671,27 @@ def get_evaluation_details(
 
             return {
 
-                "status":"error",
+                "status": "error",
 
-                "message":"Evaluation not found"
+                "message": "Evaluation not found"
 
             }
 
-        results = []
-
-        if Path(
-
-            evaluation.results_path
-
-        ).exists():
-
-            with open(
-
-                evaluation.results_path,
-
-                "r"
-
-            ) as file:
-
-                results = json.load(
-
-                    file
-
-                )
-
         return {
 
-            "id":
-                evaluation.id,
+            "id": evaluation.id,
 
-            "evaluation_name":
-                evaluation.evaluation_name,
+            "evaluation_name": evaluation.evaluation_name,
 
-            "status":
-                evaluation.status,
+            "status": evaluation.status,
 
-            "total_rows":
-                evaluation.total_rows,
+            "metrics": evaluation.metrics,
 
-            "completed_rows":
-                evaluation.completed_rows,
+            "completed_rows": evaluation.completed_rows,
 
-            "metrics":
-                evaluation.metrics,
+            "total_rows": evaluation.total_rows,
 
-            "results":
-                results,
-
-            "created_at":
-                str(evaluation.created_at)
+            "created_at": str(evaluation.created_at)
 
         }
 
@@ -693,8 +699,8 @@ def get_evaluation_details(
 
         db.close()
 
-    
-    ###########################################################
+
+###########################################################
 # Delete Evaluation
 ###########################################################
 
@@ -724,9 +730,9 @@ def remove_evaluation(
 
             return {
 
-                "status":"error",
+                "status": "error",
 
-                "message":"Evaluation not found"
+                "message": "Evaluation not found"
 
             }
 
@@ -736,11 +742,7 @@ def remove_evaluation(
 
             and
 
-            Path(
-
-                evaluation.results_path
-
-            ).exists()
+            Path(evaluation.results_path).exists()
 
         ):
 
@@ -760,12 +762,11 @@ def remove_evaluation(
 
         return {
 
-            "status":"success",
-
-            "message":"Evaluation deleted"
+            "status": "success"
 
         }
 
     finally:
 
         db.close()
+
