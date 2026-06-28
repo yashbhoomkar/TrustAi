@@ -1,5 +1,6 @@
 import json
 import logging
+import shutil
 
 from pathlib import Path
 
@@ -274,27 +275,9 @@ def create_new_evaluation(
 
             EVALUATION_STORAGE /
 
-            f"evaluation_{evaluation.id}.json"
+            f"evaluation_{evaluation.id}.xlsx"
 
         )
-
-        with open(
-
-            results_path,
-
-            "w"
-
-        ) as file:
-
-            json.dump(
-
-                [],
-
-                file,
-
-                indent=4
-
-            )
 
         update_evaluation(
 
@@ -370,14 +353,20 @@ def run_evaluation(
     )
 
     ###################################################
-    # Open Workbook
+    # Create Evaluation Workbook
     ###################################################
 
-    workbook = load_workbook(
+    shutil.copyfile(
 
         dataset.storage_path,
 
-        data_only=True
+        evaluation.results_path
+
+    )
+
+    workbook = load_workbook(
+
+        evaluation.results_path
 
     )
 
@@ -386,26 +375,16 @@ def run_evaluation(
     rows = list(
 
         worksheet.iter_rows(
+
             values_only=True
+
         )
 
     )
 
-    workbook.close()
-
-    if len(rows) <= 1:
-
-        update_evaluation(
-
-            db,
-
-            evaluation,
-
-            status="completed"
-
-        )
-
-        return
+    ###################################################
+    # Read Headers
+    ###################################################
 
     headers = [
 
@@ -436,16 +415,54 @@ def run_evaluation(
     )
 
     ###################################################
-    # Evaluate Rows
+    # Create Metric Columns
     ###################################################
 
-    results = []
+    metric_columns = {}
+
+    next_column = worksheet.max_column + 1
+
+    for metric in evaluation.metrics:
+
+        worksheet.cell(
+
+            row=1,
+
+            column=next_column
+
+        ).value = f"{metric['title']} Score"
+
+        worksheet.cell(
+
+            row=1,
+
+            column=next_column + 1
+
+        ).value = f"{metric['title']} Reason"
+
+        metric_columns[
+
+            metric["title"]
+
+        ] = (
+
+            next_column,
+
+            next_column + 1
+
+        )
+
+        next_column += 2
+
+    ###################################################
+    # Evaluate Rows
+    ###################################################
 
     for index, row in enumerate(
 
         rows[1:],
 
-        start=1
+        start=2
 
     ):
 
@@ -462,7 +479,7 @@ def run_evaluation(
         )
 
         ###################################################
-        # Read Values
+        # Dataset Values
         ###################################################
 
         user_prompt = str(
@@ -503,12 +520,12 @@ def run_evaluation(
 
         logger.info(
 
-            f"Evaluating Row {index}"
+            f"Evaluating Excel Row {index}"
 
         )
 
         ###################################################
-        # Gemini
+        # Evaluate using Gemini/Ollama
         ###################################################
 
         metric_results = evaluate_row(
@@ -524,25 +541,49 @@ def run_evaluation(
         )
 
         ###################################################
-        # Save Result
+        # Write Results
         ###################################################
 
-        results.append({
+        for metric in evaluation.metrics:
 
-            "row": index,
+            title = metric["title"]
 
-            "user_prompt": user_prompt,
+            score_col, reason_col = metric_columns[title]
 
-            "expected_response": expected_response,
+            value = metric_results.get(
 
-            "llm_response": llm_response,
+                title,
 
-            "metrics": metric_results
+                {}
 
-        })
+            )
+
+            worksheet.cell(
+
+                row=index,
+
+                column=score_col
+
+            ).value = value.get(
+
+                "score"
+
+            )
+
+            worksheet.cell(
+
+                row=index,
+
+                column=reason_col
+
+            ).value = value.get(
+
+                "reason"
+
+            )
 
         ###################################################
-        # Update Progress
+        # Progress
         ###################################################
 
         update_evaluation(
@@ -551,31 +592,21 @@ def run_evaluation(
 
             evaluation,
 
-            completed_rows=index
+            completed_rows=index - 1
 
         )
 
     ###################################################
-    # Save JSON
+    # Save Workbook
     ###################################################
 
-    with open(
+    workbook.save(
 
-        evaluation.results_path,
+        evaluation.results_path
 
-        "w"
+    )
 
-    ) as file:
-
-        json.dump(
-
-            results,
-
-            file,
-
-            indent=4
-
-        )
+    workbook.close()
 
     ###################################################
     # Finish
@@ -598,7 +629,6 @@ def run_evaluation(
         f"Evaluation {evaluation.id} completed"
 
     )
-
 
 ###########################################################
 # List Evaluations
