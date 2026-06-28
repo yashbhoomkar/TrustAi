@@ -97,6 +97,12 @@ def build_mock_response(
 # Evaluate One Dataset Row
 ###########################################################
 
+import json
+
+###########################################################
+# Evaluate One Dataset Row
+###########################################################
+
 def evaluate_row(
 
     metrics,
@@ -108,6 +114,10 @@ def evaluate_row(
     llm_response
 
 ):
+
+    ###########################################################
+    # Build Metric Description
+    ###########################################################
 
     metric_prompt = ""
 
@@ -145,9 +155,7 @@ Output Type:
             metric_prompt += f"""
 
 Range:
-{metric["min_value"]}
-to
-{metric["max_value"]}
+{metric["min_value"]} to {metric["max_value"]}
 
 """
 
@@ -156,80 +164,112 @@ to
             metric_prompt += f"""
 
 Allowed Labels:
-
 {metric["discrete_values"]}
 
 """
 
+    ###########################################################
+    # Build Dynamic JSON Example
+    ###########################################################
+
+    example = {}
+
+    for metric in metrics:
+
+        example[metric["title"]] = {
+
+            "score": 5,
+
+            "reason": "Example reason"
+
+        }
+
+    example_json = json.dumps(
+
+        example,
+
+        indent=4
+
+    )
+
+    ###########################################################
+    # Build Prompt
+    ###########################################################
+
     prompt = f"""
 You are an expert LLM evaluator.
 
-Evaluate the LLM response using ALL metrics.
+Your task is to evaluate the LLM response using ONLY the metrics provided below.
 
-====================
+======================================================
+METRICS
+======================================================
 
 {metric_prompt}
 
-====================
-
-User Prompt
+======================================================
+USER PROMPT
+======================================================
 
 {user_prompt}
 
-====================
-
-Expected Response
+======================================================
+EXPECTED RESPONSE
+======================================================
 
 {expected_response}
 
-====================
-
-LLM Response
+======================================================
+LLM RESPONSE
+======================================================
 
 {llm_response}
 
-====================
+======================================================
+IMPORTANT RULES
+======================================================
 
-Return ONLY valid JSON.
+1. Evaluate EVERY metric exactly once.
 
-Example:
+2. The JSON keys MUST EXACTLY match the metric titles.
 
-{{
-    "Accuracy": {{
+3. Do NOT rename any metric.
 
-        "score": 9.2,
+4. Do NOT invent new metrics.
 
-        "reason": "..."
+5. Do NOT use names like:
+   - Accuracy
+   - Faithfulness
+   - Relevancy
+   - Overall
+   unless they are explicitly present in the metric titles.
 
-    }},
+6. Return ONLY valid JSON.
 
-    "Faithfulness": {{
+7. Do NOT wrap the JSON inside markdown.
 
-        "score": 8.9,
+8. Do NOT explain anything.
 
-        "reason": "..."
+======================================================
+EXAMPLE OUTPUT
+======================================================
 
-    }}
+{example_json}
 
-}}
-
-Do not return markdown.
-
-Do not return explanations.
-
-Return ONLY JSON.
+Return ONLY the JSON object.
 """
 
-#    ###########################################################
-#     # Print Prompt
-#     ###########################################################
+    ###########################################################
+    # Expected Metric Names
+    ###########################################################
 
-#     print("\n" + "=" * 100)
-#     print("PROMPT SENT TO LLM")
-#     print("=" * 100)
-#     print(prompt)
-#     print("=" * 100 + "\n")
+    expected_metric_names = {
 
+        metric["title"]
+
+        for metric in metrics
+
+    }
 
     ###########################################################
     # Try Gemini
@@ -242,8 +282,11 @@ Return ONLY JSON.
         )
 
         response = client.models.generate_content(
+
             model=GEMINI_MODEL,
+
             contents=prompt
+
         )
 
         print("\n" + "=" * 100)
@@ -253,8 +296,32 @@ Return ONLY JSON.
         print("=" * 100 + "\n")
 
         parsed = parse_json(
+
             response.text
+
         )
+
+        #######################################################
+        # Validate Keys
+        #######################################################
+
+        returned_metric_names = set(
+
+            parsed.keys()
+
+        )
+
+        if returned_metric_names != expected_metric_names:
+
+            raise ValueError(
+
+                f"Metric mismatch.\n"
+
+                f"Expected: {expected_metric_names}\n"
+
+                f"Received: {returned_metric_names}"
+
+            )
 
         print("\n" + "=" * 100)
         print("PARSED GEMINI JSON")
@@ -274,9 +341,10 @@ Return ONLY JSON.
         print("=" * 100 + "\n")
 
         logger.warning(
-            f"Gemini failed: {gemini_error}"
-        )
 
+            f"Gemini failed: {gemini_error}"
+
+        )
 
     ###########################################################
     # Try Ollama
@@ -285,11 +353,15 @@ Return ONLY JSON.
     try:
 
         logger.info(
+
             "Using Ollama"
+
         )
 
         ollama_response = ask_llm(
+
             prompt
+
         )
 
         print("\n" + "=" * 100)
@@ -299,8 +371,32 @@ Return ONLY JSON.
         print("=" * 100 + "\n")
 
         parsed = parse_json(
+
             ollama_response
+
         )
+
+        #######################################################
+        # Validate Keys
+        #######################################################
+
+        returned_metric_names = set(
+
+            parsed.keys()
+
+        )
+
+        if returned_metric_names != expected_metric_names:
+
+            raise ValueError(
+
+                f"Metric mismatch.\n"
+
+                f"Expected: {expected_metric_names}\n"
+
+                f"Received: {returned_metric_names}"
+
+            )
 
         print("\n" + "=" * 100)
         print("PARSED OLLAMA JSON")
@@ -320,9 +416,10 @@ Return ONLY JSON.
         print("=" * 100 + "\n")
 
         logger.warning(
-            f"Ollama failed: {ollama_error}"
-        )
 
+            f"Ollama failed: {ollama_error}"
+
+        )
 
     ###########################################################
     # Mock Response
@@ -333,7 +430,9 @@ Return ONLY JSON.
     print("=" * 100)
 
     mock = build_mock_response(
+
         metrics
+
     )
 
     print(mock)
@@ -341,7 +440,9 @@ Return ONLY JSON.
     print("=" * 100 + "\n")
 
     logger.warning(
+
         "Returning mock response."
+
     )
 
     return mock
