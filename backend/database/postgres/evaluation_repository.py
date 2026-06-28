@@ -28,10 +28,12 @@ def create_evaluation(
     results_path: str
 
 ):
-
+    print("STEP 1 - create_new_evaluation entered")
+    
     logger.info(
         f"Creating Evaluation for User {user_id}"
     )
+
 
     evaluation = Evaluation(
 

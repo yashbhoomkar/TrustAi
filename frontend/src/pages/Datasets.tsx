@@ -481,12 +481,25 @@ export default function Datasets() {
                                         <select
 
                                             value={
-                                            Object.keys(mapping).find(
+                                                Object.keys(mapping).find(
 
-                                                role => mapping[role] === column
+                                                    role => mapping[role] === column
 
-                                            ) ?? ""
-                                        }
+                                                ) ?? ""
+
+                                            }
+
+                                            onChange={(e)=>
+
+                                                updateMapping(
+
+                                                    column,
+
+                                                    e.target.value
+
+                                                )
+
+                                            }
 
                                         >
 

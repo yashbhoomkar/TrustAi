@@ -69,6 +69,7 @@ def create_new_evaluation(
 
 ):
 
+    print("=== STEP 1 === ")
     logger.info(
         f"Creating evaluation '{evaluation_name}'"
     )
@@ -90,6 +91,9 @@ def create_new_evaluation(
             dataset_id
 
         )
+
+        print("=== STEP 2 ===")
+        print(dataset.column_mapping)
 
         if dataset is None:
 
@@ -124,32 +128,19 @@ def create_new_evaluation(
         mapping = dataset.column_mapping
 
         required_fields = [
-
             "User Prompt",
-
             "Expected Response",
-
             "LLM Response"
-
         ]
 
         for field in required_fields:
 
-            if field not in mapping.values():
+            if field not in mapping:
 
                 return {
-
                     "status": "error",
-
                     "message": f"{field} mapping is missing."
-
                 }
-
-        logger.info(
-
-            "Column mapping validated"
-
-        )
 
         ###################################################
         # Read Workbook
@@ -174,6 +165,7 @@ def create_new_evaluation(
         )
 
         workbook.close()
+        print("==== STEP 3 ==== ")
 
         logger.info(
 
@@ -397,21 +389,15 @@ def run_evaluation(
         for value in rows[0]
 
     ]
-
+    
     ###################################################
-    # Reverse Mapping
+    # Column Mapping
     ###################################################
 
-    mapping = {}
-
-    for excel_column, field in dataset.column_mapping.items():
-
-        mapping[field] = excel_column
+    mapping = dataset.column_mapping
 
     logger.info(
-
         f"Resolved Mapping : {mapping}"
-
     )
 
     ###################################################
@@ -493,6 +479,10 @@ def run_evaluation(
             )
 
         )
+
+        print("===== MAPPING =====")
+        print(mapping)
+        print(mapping.keys())
 
         expected_response = str(
 
