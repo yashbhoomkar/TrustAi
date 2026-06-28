@@ -1,33 +1,35 @@
-import json
 import requests
 
 OLLAMA_URL = "http://100.98.140.51:11434/api/generate"
 MODEL = "llama3.2:latest"
 
 
-def ask_llm(system_prompt: str, user_prompt: str) -> str:
-    """
-    Calls Ollama and returns the response text.
-    """
+###########################################################
+# Ask Ollama
+###########################################################
 
-    prompt = f"""
-System:
-{system_prompt}
-
-User:
-{user_prompt}
-"""
+def ask_llm(
+    prompt: str
+) -> str:
 
     response = requests.post(
+
         OLLAMA_URL,
+
         json={
+
             "model": MODEL,
+
             "prompt": prompt,
-            "stream": False,
+
+            "stream": False
+
         },
-        timeout=300,
+
+        timeout=300
+
     )
 
     response.raise_for_status()
 
-    return response.json()["response"]
+    return response.json()["response"].strip()

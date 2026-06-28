@@ -8,11 +8,89 @@ from core.config import (
     GEMINI_MODEL
 )
 
+from services.llm_service import (
+    ask_llm
+)
+
 logger = logging.getLogger(__name__)
 
 client = genai.Client(
     api_key=GEMINI_API_KEY
 )
+
+
+###########################################################
+# Parse JSON
+###########################################################
+
+def parse_json(
+    text: str
+):
+
+    text = text.strip()
+
+    if text.startswith("```"):
+
+        text = (
+
+            text
+
+            .replace("```json", "")
+
+            .replace("```", "")
+
+            .strip()
+
+        )
+
+    return json.loads(text)
+
+
+###########################################################
+# Mock Response
+###########################################################
+
+def build_mock_response(
+    metrics
+):
+
+    response = {}
+
+    for metric in metrics:
+
+        if metric["output_type"] == "continuous":
+
+            score = (
+
+                metric["min_value"]
+
+                +
+
+                metric["max_value"]
+
+            ) / 2
+
+        else:
+
+            labels = metric["discrete_values"]
+
+            if isinstance(labels, list) and len(labels) > 0:
+
+                score = labels[0]
+
+            else:
+
+                score = "Unknown"
+
+        response[metric["title"]] = {
+
+            "score": score,
+
+            "reason": "Mock response because all LLM providers failed."
+
+        }
+
+    return response
 
 
 ###########################################################
@@ -142,40 +220,80 @@ Do not return explanations.
 Return ONLY JSON.
 """
 
-    response = client.models.generate_content(
-
-        model=GEMINI_MODEL,
-
-        contents=prompt
-
-    )
-
-    text = response.text.strip()
-
-    if text.startswith("```"):
-
-        text = (
-
-            text
-
-            .replace("```json","")
-
-            .replace("```","")
-
-            .strip()
-
-        )
+    ###########################################################
+    # Try Gemini
+    ###########################################################
 
     try:
 
-        return json.loads(text)
+        logger.info(
+            "Using Gemini"
+        )
 
-    except Exception:
+        response = client.models.generate_content(
 
-        logger.exception(
+            model=GEMINI_MODEL,
 
-            "Gemini returned invalid JSON."
+            contents=prompt
 
         )
 
-        return {}
+        return parse_json(
+
+            response.text
+
+        )
+
+    except Exception as gemini_error:
+
+        logger.warning(
+
+            f"Gemini failed: {gemini_error}"
+
+        )
+
+    ###########################################################
+    # Try Ollama
+    ###########################################################
+
+    try:
+
+        logger.info(
+            "Using Ollama"
+        )
+
+        ollama_response = ask_llm(
+
+            prompt
+
+        )
+
+        return parse_json(
+
+            ollama_response
+
+        )
+
+    except Exception as ollama_error:
+
+        logger.warning(
+
+            f"Ollama failed: {ollama_error}"
+
+        )
+
+    ###########################################################
+    # Mock Response
+    ###########################################################
+
+    logger.warning(
+
+        "Returning mock response."
+
+    )
+
+    return build_mock_response(
+
+        metrics
+
+    )

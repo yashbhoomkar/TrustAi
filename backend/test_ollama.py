@@ -4,7 +4,7 @@ response = ask_llm(
 
     "You are helpful.",
 
-    "Say Hello"
+    "what is sex"
 
 )
 
