@@ -59,154 +59,325 @@ export default function Reports() {
 
     }
 
-    ///////////////////////////////////////////////////////////
+        ///////////////////////////////////////////////////////////
 
     if (report) {
 
         return (
 
-            <div>
+            <div className="metrics-page">
 
                 <button
-                    onClick={() => setReport(null)}
+
+                    className="secondary-button"
+
+                    onClick={() =>
+
+                        setReport(null)
+
+                    }
+
                     style={{
+
                         marginBottom: 20
+
                     }}
+
                 >
-                    ← Back
+
+                    ← Back to Reports
+
                 </button>
 
-                <h1>
-                    Evaluation Report
-                </h1>
+                <div className="preview-card">
 
-                <hr />
+                    <div className="card-header">
 
-                <p>
-                    <b>Name:</b> {report.evaluation_name}
-                </p>
+                        <div>
 
-                <p>
-                    <b>Dataset:</b> {report.dataset_name}
-                </p>
+                            <h2>
 
-                <p>
-                    <b>Status:</b> {report.status}
-                </p>
+                                {report.evaluation_name}
 
-                <p>
-                    <b>Rows:</b> {report.rows}
-                </p>
+                            </h2>
 
-                <p>
-                    <b>Created:</b> {report.created_at}
-                </p>
+                            <p>
 
-                <h2>
-                    Selected Metrics
-                </h2>
+                                {report.dataset_name}
 
-                <ul>
+                            </p>
 
-                    {report.selected_metrics.map(
-                        (metric: string) => (
+                        </div>
 
-                            <li key={metric}>
-                                {metric}
-                            </li>
+                        <span className="badge badge-green">
 
-                        )
-                    )}
+                            {report.status}
 
-                </ul>
+                        </span>
 
-                <h2>
-                    Metric Averages
-                </h2>
+                    </div>
 
-                <table
-                    border={1}
-                    cellPadding={10}
-                    style={{
-                        borderCollapse: "collapse"
-                    }}
-                >
+                    <div className="form-grid">
 
-                    <thead>
+                        <div className="preview-section">
 
-                        <tr>
+                            <strong>
 
-                            <th>
-                                Metric
-                            </th>
+                                Dataset
 
-                            <th>
-                                Average
-                            </th>
+                            </strong>
 
-                        </tr>
+                            <p>
 
-                    </thead>
+                                {report.dataset_name}
 
-                    <tbody>
+                            </p>
+
+                        </div>
+
+                        <div className="preview-section">
+
+                            <strong>
+
+                                Rows
+
+                            </strong>
+
+                            <p>
+
+                                {report.rows}
+
+                            </p>
+
+                        </div>
+
+                        <div className="preview-section">
+
+                            <strong>
+
+                                Status
+
+                            </strong>
+
+                            <p>
+
+                                {report.status}
+
+                            </p>
+
+                        </div>
+
+                        <div className="preview-section">
+
+                            <strong>
+
+                                Created
+
+                            </strong>
+
+                            <p>
+
+                                {
+
+                                    new Date(
+
+                                        report.created_at
+
+                                    ).toLocaleString()
+
+                                }
+
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                    <br/>
+
+                    <h3>
+
+                        Selected Metrics
+
+                    </h3>
+
+                    <div className="action-buttons">
 
                         {
 
-                            Object.entries(
-                                report.metric_averages
-                            ).map(
-                                ([metric, average]) => (
+                            report.selected_metrics.map(
 
-                                    <tr key={metric}>
+                                (
 
-                                        <td>
-                                            {metric}
-                                        </td>
+                                    metric: string
 
-                                        <td>
-                                            {average as number}
-                                        </td>
+                                ) => (
 
-                                    </tr>
+                                    <span
+
+                                        key={metric}
+
+                                        className="badge badge-blue"
+
+                                    >
+
+                                        {metric}
+
+                                    </span>
 
                                 )
+
                             )
 
                         }
 
-                    </tbody>
+                    </div>
 
-                </table>
+                    <br/>
 
-                <br />
+                    <h3>
 
-                <p>
+                        Metric Averages
 
-                    <b>Best Metric:</b>
+                    </h3>
 
-                    {" "}
+                    <table className="modern-table">
 
-                    {report.best_metric.title}
+                        <thead>
 
-                    {" "}
+                            <tr>
 
-                    ({report.best_metric.average})
+                                <th>
 
-                </p>
+                                    Metric
 
-                <p>
+                                </th>
 
-                    <b>Worst Metric:</b>
+                                <th>
 
-                    {" "}
+                                    Average
 
-                    {report.worst_metric.title}
+                                </th>
 
-                    {" "}
+                            </tr>
 
-                    ({report.worst_metric.average})
+                        </thead>
 
-                </p>
+                        <tbody>                            {
+
+                                Object.entries(
+
+                                    report.metric_averages
+
+                                ).map(
+
+                                    ([metric, average]) => (
+
+                                        <tr key={metric}>
+
+                                            <td>
+
+                                                {metric}
+
+                                            </td>
+
+                                            <td>
+
+                                                <strong>
+
+                                                    {
+
+                                                        Number(
+
+                                                            average
+
+                                                        ).toFixed(2)
+
+                                                    }
+
+                                                </strong>
+
+                                            </td>
+
+                                        </tr>
+
+                                    )
+
+                                )
+
+                            }
+
+                        </tbody>
+
+                    </table>
+
+                    <br/>
+
+                    <div className="form-grid">
+
+                        <div className="preview-section">
+
+                            <strong>
+
+                                Best Metric
+
+                            </strong>
+
+                            <p>
+
+                                {
+
+                                    report.best_metric.title
+
+                                }
+
+                            </p>
+
+                            <span className="badge badge-green">
+
+                                {
+
+                                    report.best_metric.average
+
+                                }
+
+                            </span>
+
+                        </div>
+
+                        <div className="preview-section">
+
+                            <strong>
+
+                                Worst Metric
+
+                            </strong>
+
+                            <p>
+
+                                {
+
+                                    report.worst_metric.title
+
+                                }
+
+                            </p>
+
+                            <span className="badge badge-orange">
+
+                                {
+
+                                    report.worst_metric.average
+
+                                }
+
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                </div>
 
             </div>
 
@@ -218,84 +389,145 @@ export default function Reports() {
 
     return (
 
-        <div>
+        <div className="metrics-page">
 
-            <h1>
+            <div className="page-header">
 
-                Reports
+                <div>
 
-            </h1>
+                    <h1>
 
-            <table
-                border={1}
-                cellPadding={10}
-                style={{
-                    borderCollapse: "collapse",
-                    width: "100%"
-                }}
-            >
+                        Reports
 
-                <thead>
+                    </h1>
 
-                    <tr>
+                    <p>
 
-                        <th>
-                            Name
-                        </th>
+                        Browse completed evaluation reports.
 
-                        <th>
-                            Status
-                        </th>
+                    </p>
 
-                        <th>
-                            Created
-                        </th>
+                </div>
 
-                        <th>
+            </div>
 
-                        </th>
+            <div className="metrics-card">
 
-                    </tr>
+                <div className="card-header">
 
-                </thead>
+                    <h2>
 
-                <tbody>
+                        Evaluation Reports
 
-                    {
+                    </h2>
+
+                    <span>
+
+                        {
+
+                            evaluations.length
+
+                        }
+
+                        {" "}Reports
+
+                    </span>
+
+                </div>
+
+                <table className="modern-table">
+
+                    <thead>
+
+                        <tr>
+
+                            <th>
+
+                                Evaluation
+
+                            </th>
+
+                            <th>
+
+                                Status
+
+                            </th>
+
+                            <th>
+
+                                Created
+
+                            </th>
+
+                            <th>
+
+                                Action
+
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+                                            {
 
                         evaluations.map(
+
                             (evaluation) => (
 
                                 <tr key={evaluation.id}>
 
                                     <td>
 
-                                        {evaluation.evaluation_name}
+                                        <strong>
+
+                                            {evaluation.evaluation_name}
+
+                                        </strong>
 
                                     </td>
 
                                     <td>
 
-                                        {evaluation.status}
+                                        <span className="badge badge-green">
+
+                                            {evaluation.status}
+
+                                        </span>
 
                                     </td>
 
                                     <td>
 
-                                        {new Date(
-                                            evaluation.created_at
-                                        ).toLocaleString()}
+                                        {
+
+                                            new Date(
+
+                                                evaluation.created_at
+
+                                            ).toLocaleString()
+
+                                        }
 
                                     </td>
 
                                     <td>
 
                                         <button
+
+                                            className="primary-button"
+
                                             onClick={() =>
+
                                                 openReport(
+
                                                     evaluation.id
+
                                                 )
+
                                             }
+
                                         >
 
                                             View Report
@@ -307,13 +539,16 @@ export default function Reports() {
                                 </tr>
 
                             )
+
                         )
 
                     }
 
-                </tbody>
+                    </tbody>
 
-            </table>
+                </table>
+
+            </div>
 
         </div>
 

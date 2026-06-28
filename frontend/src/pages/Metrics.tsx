@@ -265,193 +265,203 @@ export default function Metrics() {
 
     return (
 
-        <div>
+    <div className="metrics-page">
 
-            <h1>
+        <div className="page-header">
 
-                Metrics
+            <div>
 
-            </h1>
+                <h1>
+                    Metrics
+                </h1>
 
-            <hr/>
+                <p>
+                    Create and manage evaluation metrics for TrustAI.
+                </p>
+
+            </div>
+
+        </div>
+
+        <div className="metric-form-card">
 
             <h2>
 
-                Create Metric
+                {
+                    editingMetricId == null
+                        ? "Create Metric"
+                        : "Edit Metric"
+                }
 
             </h2>
 
-            <input
+            <div className="form-grid">
 
-                placeholder="Title"
+                <div className="field">
 
-                value={title}
+                    <label>
 
-                onChange={(e)=>
+                        Title
 
-                    setTitle(
+                    </label>
 
-                        e.target.value
+                    <input
+                        value={title}
+                        placeholder="Metric title"
+                        onChange={(e) =>
+                            setTitle(
+                                e.target.value
+                            )
+                        }
+                    />
 
-                    )
+                </div>
 
-                }
+                <div className="field">
 
-            />
+                    <label>
 
-            <br/><br/>
+                        Output Type
 
-            <textarea
+                    </label>
 
-                placeholder="Description"
+                    <select
+                        value={outputType}
+                        onChange={(e) =>
+                            setOutputType(
+                                e.target.value
+                            )
+                        }
+                    >
 
-                value={description}
+                        <option value="continuous">
 
-                onChange={(e)=>
+                            Continuous
 
-                    setDescription(
+                        </option>
 
-                        e.target.value
+                        <option value="discrete">
 
-                    )
+                            Discrete
 
-                }
+                        </option>
 
-            />
+                    </select>
 
-            <br/><br/>
+                </div>
 
-            <textarea
+                <div className="field full-width">
 
-                placeholder="System Prompt"
+                    <label>
 
-                value={systemPrompt}
+                        Description
 
-                onChange={(e)=>
+                    </label>
 
-                    setSystemPrompt(
+                    <textarea
+                        value={description}
+                        onChange={(e) =>
+                            setDescription(
+                                e.target.value
+                            )
+                        }
+                    />
 
-                        e.target.value
+                </div>
 
-                    )
+                <div className="field full-width">
 
-                }
+                    <label>
 
-            />
+                        System Prompt
 
-            <br/><br/>
+                    </label>
 
-            <textarea
+                    <textarea
+                        value={systemPrompt}
+                        onChange={(e) =>
+                            setSystemPrompt(
+                                e.target.value
+                            )
+                        }
+                    />
 
-                placeholder="General Instructions"
+                </div>
 
-                value={generalInstructions}
+                <div className="field full-width">
 
-                onChange={(e)=>
+                    <label>
 
-                    setGeneralInstructions(
+                        General Instructions
 
-                        e.target.value
+                    </label>
 
-                    )
+                    <textarea
+                        value={generalInstructions}
+                        onChange={(e) =>
+                            setGeneralInstructions(
+                                e.target.value
+                            )
+                        }
+                    />
 
-                }
+                </div>
 
-            />
+            </div>
 
-            <br/><br/>
-
-            <select
-
-                value={outputType}
-
-                onChange={(e)=>
-
-                    setOutputType(
-
-                        e.target.value
-
-                    )
-
-                }
-
-            >
-
-                <option value="continuous">
-
-                    Continuous
-
-                </option>
-
-                <option value="discrete">
-
-                    Discrete
-
-                </option>
-
-            </select>
-
-            <br/><br/>
-
-            {
+                        {
 
                 outputType === "continuous"
 
                 &&
 
-                <>
+                <div className="range-grid">
 
-                    <input
+                    <div className="field">
 
-                        type="number"
+                        <label>
 
-                        placeholder="Minimum"
+                            Minimum Value
 
-                        value={minValue}
+                        </label>
 
-                        onChange={(e)=>
-
-                            setMinValue(
-
-                                Number(
-
-                                    e.target.value
-
+                        <input
+                            type="number"
+                            value={minValue}
+                            onChange={(e) =>
+                                setMinValue(
+                                    Number(
+                                        e.target.value
+                                    )
                                 )
+                            }
+                        />
 
-                            )
+                    </div>
 
-                        }
+                    <div className="field">
 
-                    />
+                        <label>
 
-                    <br/><br/>
+                            Maximum Value
 
-                    <input
+                        </label>
 
-                        type="number"
-
-                        placeholder="Maximum"
-
-                        value={maxValue}
-
-                        onChange={(e)=>
-
-                            setMaxValue(
-
-                                Number(
-
-                                    e.target.value
-
+                        <input
+                            type="number"
+                            value={maxValue}
+                            onChange={(e) =>
+                                setMaxValue(
+                                    Number(
+                                        e.target.value
+                                    )
                                 )
+                            }
+                        />
 
-                            )
+                    </div>
 
-                        }
-
-                    />
-
-                </>
+                </div>
 
             }
 
@@ -461,27 +471,31 @@ export default function Metrics() {
 
                 &&
 
-                <>
+                <div className="field full-width">
+
+                    <label>
+
+                        Possible Values
+
+                    </label>
 
                     <textarea
 
                         placeholder="One value per line"
 
-                        onChange={(e)=>
+                        onChange={(e) =>
 
                             setDiscreteValues(
 
                                 e.target.value
+                                    .split("\n")
+                                    .filter(
 
-                                .split("\n")
+                                        value =>
 
-                                .filter(
+                                            value.trim() !== ""
 
-                                    v =>
-
-                                    v.trim() !== ""
-
-                                )
+                                    )
 
                             )
 
@@ -489,44 +503,107 @@ export default function Metrics() {
 
                     />
 
-                </>
+                </div>
 
             }
 
-            <br/><br/>
-
-            <button
-    onClick={handleSubmit}
->
-
-    {
-
-        editingMetricId == null
-
-        ?
-
-        "Create Metric"
-
-        :
-
-        "Update Metric"
-
-    }
-
-</button>
-
-            <hr/>
-
-            <h2>
-
-                Metrics
-
-            </h2>
-
-            <table
-                border={1}
-                cellPadding={8}
+            <div
+                style={{
+                    marginTop: "24px"
+                }}
             >
+
+                <button
+
+                    className="primary-button"
+
+                    onClick={handleSubmit}
+
+                >
+
+                    {
+
+                        editingMetricId == null
+
+                            ? "Create Metric"
+
+                            : "Update Metric"
+
+                    }
+
+                </button>
+
+                {
+
+                    editingMetricId != null
+
+                    &&
+
+                    <button
+
+                        className="cancel-button"
+
+                        style={{
+                            marginLeft: "12px"
+                        }}
+
+                        onClick={() => {
+
+                            setEditingMetricId(null);
+
+                            setTitle("");
+
+                            setDescription("");
+
+                            setSystemPrompt("");
+
+                            setGeneralInstructions("");
+
+                            setOutputType(
+                                "continuous"
+                            );
+
+                            setMinValue(0);
+
+                            setMaxValue(10);
+
+                            setDiscreteValues([]);
+
+                            setSelectedMetric(null);
+
+                        }}
+
+                    >
+
+                        Cancel
+
+                    </button>
+
+                }
+
+            </div>
+
+        </div>
+
+                <div className="metrics-card">
+
+            <div className="card-header">
+
+                <h2>
+
+                    Your Metrics
+
+                </h2>
+
+                <span>
+
+                    {metrics.length} Metric(s)
+
+                </span>
+
+            </div>
+
+            <table className="modern-table">
 
                 <thead>
 
@@ -534,7 +611,7 @@ export default function Metrics() {
 
                         <th>
 
-                            Title
+                            Metric
 
                         </th>
 
@@ -552,7 +629,7 @@ export default function Metrics() {
 
                         <th>
 
-                            Delete
+                            Actions
 
                         </th>
 
@@ -566,13 +643,7 @@ export default function Metrics() {
 
                         metrics.map(
 
-                            (
-
-                                metric
-
-                            )=>
-
-                            (
+                            (metric) => (
 
                                 <tr
                                     key={metric.id}
@@ -580,37 +651,43 @@ export default function Metrics() {
 
                                     <td>
 
-                                        <button
+                                        <div>
 
-                                            onClick={()=>
+                                            <div className="metric-title">
 
-                                                handlePreview(
+                                                {metric.title}
 
-                                                    metric.id
+                                            </div>
 
-                                                )
+                                            <div className="metric-subtitle">
 
-                                            }
+                                                {metric.description || "No description"}
 
-                                        >
+                                            </div>
 
-                                            {
-
-                                                metric.title
-
-                                            }
-
-                                        </button>
+                                        </div>
 
                                     </td>
 
                                     <td>
 
-                                        {
+                                        <span
 
-                                            metric.output_type
+                                            className={
 
-                                        }
+                                                metric.output_type === "continuous"
+
+                                                    ? "badge badge-blue"
+
+                                                    : "badge badge-orange"
+
+                                            }
+
+                                        >
+
+                                            {metric.output_type}
+
+                                        </span>
 
                                     </td>
 
@@ -622,11 +699,15 @@ export default function Metrics() {
 
                                             ?
 
-                                            "Yes"
+                                            <span className="badge badge-green">
+
+                                                Default
+
+                                            </span>
 
                                             :
 
-                                            "No"
+                                            "-"
 
                                         }
 
@@ -634,69 +715,55 @@ export default function Metrics() {
 
                                     <td>
 
-                                        <button
+                                        <div className="action-buttons">
 
-                                            disabled={
+                                            <button
 
-                                                metric.is_default
+                                                className="secondary-button"
 
-                                            }
+                                                onClick={() =>
 
-                                            onClick={()=>
+                                                    handlePreview(
 
-                                                handleDelete(
+                                                        metric.id
 
-                                                    metric.id
+                                                    )
 
-                                                )
+                                                }
 
-                                            }
+                                            >
 
-                                        >
+                                                View
 
-                                            Delete
+                                            </button>
 
-                                        </button>
+                                            <button
 
-                                        {
+                                                className="danger-button"
 
-editingMetricId != null &&
+                                                disabled={
 
-<button
+                                                    metric.is_default
 
-    onClick={() => {
+                                                }
 
-        setEditingMetricId(
-            null
-        );
+                                                onClick={() =>
 
-        setTitle("");
+                                                    handleDelete(
 
-        setDescription("");
+                                                        metric.id
 
-        setSystemPrompt("");
+                                                    )
 
-        setGeneralInstructions("");
+                                                }
 
-        setOutputType(
-            "continuous"
-        );
+                                            >
 
-        setMinValue(0);
+                                                Delete
 
-        setMaxValue(10);
+                                            </button>
 
-        setDiscreteValues([]);
-
-    }}
-
->
-
-Cancel
-
-</button>
-
-}
+                                        </div>
 
                                     </td>
 
@@ -712,21 +779,15 @@ Cancel
 
             </table>
 
-            {
+        </div>
 
-                selectedMetric &&
+                {
 
-                <>
+            selectedMetric && (
 
-                    <hr/>
+                <div className="preview-card">
 
-                    <div
-                        style={{
-                            display: "flex",
-                            justifyContent: "space-between",
-                            alignItems: "center"
-                        }}
-                    >
+                    <div className="card-header">
 
                         <h2>
 
@@ -734,147 +795,209 @@ Cancel
 
                         </h2>
 
-                        <div>
+                        {
 
-                            {
+                            !selectedMetric.is_default &&
 
-                                !selectedMetric.is_default &&
+                            <button
 
-                                <button
-                                    onClick={() =>
-                                        handleDelete(
-                                            selectedMetric.id
-                                        )
-                                    }
-                                >
+                                className="danger-button"
 
-                                    Delete
+                                onClick={() =>
 
-                                </button>
+                                    handleDelete(
 
-                            }
+                                        selectedMetric.id
 
-                        </div>
+                                    )
+
+                                }
+
+                            >
+
+                                Delete
+
+                            </button>
+
+                        }
 
                     </div>
 
-                    <p>
-
-                        <b>Title:</b>
-
-                        {" "}
-
-                        {
-
-                            selectedMetric.title
-
-                        }
-
-                    </p>
-
-                    <p>
-
-                        <b>Description:</b>
-
-                        {" "}
-
-                        {
-
-                            selectedMetric.description
-
-                        }
-
-                    </p>
-
-                    <p>
-
-                        <b>System Prompt:</b>
-
-                        {" "}
-
-                        {
-
-                            selectedMetric.system_prompt
-
-                        }
-
-                    </p>
-
-                    <p>
-
-                        <b>General Instructions:</b>
-
-                        {" "}
-
-                        {
-
-                            selectedMetric.general_instructions
-
-                        }
-
-                    </p>
-
-                    <p>
-
-                        <b>Output Type:</b>
-
-                        {" "}
-
-                        {
-
-                            selectedMetric.output_type
-
-                        }
-
-                    </p>
-
-                    {
-
-                        selectedMetric.output_type
-
-                        ===
-
-                        "continuous"
-
-                        ?
+                    <div className="preview-section">
 
                         <p>
 
-                            <b>
+                            <strong>
 
-                                Range:
+                                Title
 
-                            </b>
+                            </strong>
 
-                            {" "}
+                        </p>
+
+                        <p>
+
+                            {selectedMetric.title}
+
+                        </p>
+
+                    </div>
+
+                    <div className="preview-section">
+
+                        <p>
+
+                            <strong>
+
+                                Description
+
+                            </strong>
+
+                        </p>
+
+                        <p>
 
                             {
 
-                                selectedMetric.min_value
+                                selectedMetric.description ||
 
-                            }
-
-                            {" - "}
-
-                            {
-
-                                selectedMetric.max_value
+                                "No description"
 
                             }
 
                         </p>
 
-                        :
+                    </div>
 
-                        <div>
+                    <div className="preview-section">
 
-                            <b>
+                        <p>
 
-                                Values
+                            <strong>
 
-                            </b>
+                                System Prompt
 
-                            <ul>
+                            </strong>
+
+                        </p>
+
+                        <p>
+
+                            {selectedMetric.system_prompt}
+
+                        </p>
+
+                    </div>
+
+                    <div className="preview-section">
+
+                        <p>
+
+                            <strong>
+
+                                General Instructions
+
+                            </strong>
+
+                        </p>
+
+                        <p>
+
+                            {
+
+                                selectedMetric.general_instructions ||
+
+                                "None"
+
+                            }
+
+                        </p>
+
+                    </div>
+
+                    <div className="preview-section">
+
+                        <p>
+
+                            <strong>
+
+                                Output Type
+
+                            </strong>
+
+                        </p>
+
+                        <span
+
+                            className={
+
+                                selectedMetric.output_type === "continuous"
+
+                                    ? "badge badge-blue"
+
+                                    : "badge badge-orange"
+
+                            }
+
+                        >
+
+                            {selectedMetric.output_type}
+
+                        </span>
+
+                    </div>
+
+                    {
+
+                        selectedMetric.output_type === "continuous"
+
+                        &&
+
+                        <div className="preview-section">
+
+                            <p>
+
+                                <strong>
+
+                                    Range
+
+                                </strong>
+
+                            </p>
+
+                            <p>
+
+                                {selectedMetric.min_value}
+
+                                {"  -  "}
+
+                                {selectedMetric.max_value}
+
+                            </p>
+
+                        </div>
+
+                    }
+
+                    {
+
+                        selectedMetric.output_type === "discrete"
+
+                        &&
+
+                        <div className="preview-section">
+
+                            <p>
+
+                                <strong>
+
+                                    Allowed Values
+
+                                </strong>
+
+                            </p>
+
+                            <ul className="values-list">
 
                                 {
 
@@ -886,19 +1009,11 @@ Cancel
 
                                             index: number
 
-                                        )=>
+                                        ) => (
 
-                                        (
+                                            <li key={index}>
 
-                                            <li
-                                                key={index}
-                                            >
-
-                                                {
-
-                                                    value
-
-                                                }
+                                                {value}
 
                                             </li>
 
@@ -914,12 +1029,14 @@ Cancel
 
                     }
 
-                </>
+                </div>
 
-            }
+            )
 
-        </div>
+        }
 
-    );
+    </div>
+
+);
 
 }
