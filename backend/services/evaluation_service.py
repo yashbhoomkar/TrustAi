@@ -5,6 +5,8 @@ import shutil
 from pathlib import Path
 
 from openpyxl import load_workbook
+from pathlib import Path
+from fastapi.responses import FileResponse
 
 from database.postgres.connection import (
     SessionLocal
@@ -389,7 +391,7 @@ def run_evaluation(
         for value in rows[0]
 
     ]
-    
+
     ###################################################
     # Column Mapping
     ###################################################
@@ -790,3 +792,202 @@ def remove_evaluation(
 
         db.close()
 
+###########################################################
+# Get Evaluation Results
+###########################################################
+
+def get_evaluation_results(
+
+    user_id: int,
+
+    evaluation_id: int
+
+):
+
+    db = SessionLocal()
+
+    try:
+
+        ###################################################
+        # Load Evaluation
+        ###################################################
+
+        evaluation = get_evaluation(
+
+            db,
+
+            user_id,
+
+            evaluation_id
+
+        )
+
+        if evaluation is None:
+
+            return {
+
+                "status": "error",
+
+                "message": "Evaluation not found"
+
+            }
+
+        ###################################################
+        # Check File Exists
+        ###################################################
+
+        results_file = Path(
+
+            evaluation.results_path
+
+        )
+
+        if not results_file.exists():
+
+            return {
+
+                "status": "error",
+
+                "message": "Results file not found"
+
+            }
+
+        ###################################################
+        # Load Workbook
+        ###################################################
+
+        workbook = load_workbook(
+
+            results_file,
+
+            data_only=True
+
+        )
+
+        worksheet = workbook.active
+
+        rows = list(
+
+            worksheet.iter_rows(
+
+                values_only=True
+
+            )
+
+        )
+
+        ###################################################
+        # Empty Workbook
+        ###################################################
+
+        if not rows:
+
+            workbook.close()
+
+            return {
+
+                "headers": [],
+
+                "rows": []
+
+            }
+
+        ###################################################
+        # Headers
+        ###################################################
+
+        headers = [
+
+            "" if value is None else str(value)
+
+            for value in rows[0]
+
+        ]
+
+        ###################################################
+        # Data
+        ###################################################
+
+        data = []
+
+        for row in rows[1:]:
+
+            data.append(
+
+                [
+
+                    "" if value is None else value
+
+                    for value in row
+
+                ]
+
+            )
+
+        workbook.close()
+
+        ###################################################
+        # Response
+        ###################################################
+
+        return {
+
+            "headers": headers,
+
+            "rows": data
+
+        }
+
+    finally:
+
+        db.close()
+
+###########################################################
+# Download Evaluation
+###########################################################
+
+def download_evaluation(
+
+    user_id: int,
+
+    evaluation_id: int
+
+):
+
+    db = SessionLocal()
+
+    try:
+
+        evaluation = get_evaluation(
+
+            db,
+
+            user_id,
+
+            evaluation_id
+
+        )
+
+        if evaluation is None:
+
+            return None
+
+        results_file = Path(
+
+            evaluation.results_path
+
+        )
+
+        if not results_file.exists():
+
+            return None
+
+        return str(
+
+            results_file
+
+        )
+
+    finally:
+
+        db.close()

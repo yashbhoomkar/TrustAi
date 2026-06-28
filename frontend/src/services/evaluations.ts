@@ -89,3 +89,19 @@ export async function deleteEvaluation(
     return response.data;
 
 }
+
+export const getEvaluationResults = async (id: number) => {
+    const response = await api.get(`/evaluations/${id}/results`);
+    return response.data;
+};
+
+export const downloadEvaluation = async (id: number) => {
+    const response = await api.get(
+        `/evaluations/${id}/download`,
+        {
+            responseType: "blob",
+        }
+    );
+
+    return response.data;
+};

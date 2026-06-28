@@ -18,7 +18,11 @@ import {
 
     createEvaluation,
 
-    deleteEvaluation
+    deleteEvaluation,
+
+    getEvaluationResults,
+
+    downloadEvaluation
 
 } from "../services/evaluations";
 
@@ -47,6 +51,12 @@ export default function Evaluations() {
     const [selectedMetrics, setSelectedMetrics] =
 
         useState<number[]>([]);
+
+    const [tableHeaders, setTableHeaders] = useState<string[]>([]);
+    const [tableRows, setTableRows] = useState<any[][]>([]);
+
+    const [selectedEvaluationId, setSelectedEvaluationId] =
+    useState<number | null>(null);
 
     ///////////////////////////////////////////////////////
 
@@ -188,6 +198,40 @@ export default function Evaluations() {
         setSelectedMetrics([]);
 
         loadData();
+
+    }
+
+    async function handleViewResults(id: number) {
+
+        const response = await getEvaluationResults(id);
+
+        setTableHeaders(response.headers);
+
+        setTableRows(response.rows);
+
+        setSelectedEvaluationId(id);
+
+    }
+
+    async function handleDownload(id: number) {
+
+        const blob = await downloadEvaluation(id);
+
+        const url = window.URL.createObjectURL(blob);
+
+        const link = document.createElement("a");
+
+        link.href = url;
+
+        link.download = `evaluation_${id}.xlsx`;
+
+        document.body.appendChild(link);
+
+        link.click();
+
+        link.remove();
+
+        window.URL.revokeObjectURL(url);
 
     }
 
@@ -427,6 +471,10 @@ export default function Evaluations() {
 
                         <th>Progress</th>
 
+                        <th>View</th>
+
+                        <th>Download</th>
+
                         <th>Delete</th>
 
                     </tr>
@@ -516,6 +564,25 @@ export default function Evaluations() {
                                         </button>
 
                                     </td>
+                                    <td>
+
+                                        <button
+                                            onClick={() => handleViewResults(evaluation.id)}
+                                        >
+                                            View Results
+                                        </button>
+
+                                    </td>
+
+                                    <td>
+
+                                        <button
+                                            onClick={() => handleDownload(evaluation.id)}
+                                        >
+                                            Download
+                                        </button>
+
+                                    </td>
 
                                 </tr>
 
@@ -529,8 +596,102 @@ export default function Evaluations() {
 
             </table>
 
+            {
+    selectedEvaluationId !== null && (
+
+        <>
+
+            <hr />
+
+            <h2>
+
+                Evaluation Results
+
+            </h2>
+
+            <div
+                style={{
+                    overflow: "auto",
+                    maxHeight: "600px",
+                    border: "1px solid #ccc"
+                }}
+            >
+
+                <table
+                    border={1}
+                    cellPadding={6}
+                >
+
+                    <thead>
+
+                        <tr>
+
+                            {
+
+                                tableHeaders.map(header => (
+
+                                    <th key={header}>
+
+                                        {header}
+
+                                    </th>
+
+                                ))
+
+                            }
+
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                        {
+
+                            tableRows.map((row, index) => (
+
+                                <tr key={index}>
+
+                                    {
+
+                                        row.map((cell, cellIndex) => (
+
+                                            <td key={cellIndex}>
+
+                                                {
+
+                                                    cell === null
+                                                        ? ""
+                                                        : String(cell)
+
+                                                }
+
+                                            </td>
+
+                                        ))
+
+                                    }
+
+                                </tr>
+
+                            ))
+
+                        }
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </>
+
+    )
+}
+
         </div>
 
     );
 
 }
+

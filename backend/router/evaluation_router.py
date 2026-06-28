@@ -1,4 +1,6 @@
 import logging
+from fastapi.responses import FileResponse
+from pathlib import Path
 
 from fastapi import (
     APIRouter,
@@ -21,6 +23,10 @@ from services.evaluation_service import (
     list_all_evaluations,
 
     get_evaluation_details,
+
+    get_evaluation_results,
+
+    download_evaluation,
 
     remove_evaluation
 
@@ -156,5 +162,78 @@ async def delete_evaluation_endpoint(
         current_user.id,
 
         evaluation_id
+
+    )
+
+###########################################################
+# Get Evaluation Results
+###########################################################
+
+@evaluation_router.get("/{evaluation_id}/results")
+async def get_evaluation_results_endpoint(
+
+    evaluation_id: int,
+
+    current_user = Depends(
+        get_current_user
+    )
+
+):
+
+    logger.info(
+
+        f"Getting evaluation results {evaluation_id}"
+
+    )
+
+    return get_evaluation_results(
+
+        current_user.id,
+
+        evaluation_id
+
+    )
+
+
+###########################################################
+# Download Evaluation
+###########################################################
+
+@evaluation_router.get("/{evaluation_id}/download")
+async def download_evaluation_endpoint(
+
+    evaluation_id: int,
+
+    current_user = Depends(
+        get_current_user
+    )
+
+):
+
+    file_path = download_evaluation(
+
+        current_user.id,
+
+        evaluation_id
+
+    )
+
+    if file_path is None:
+
+        return {
+
+            "status": "error",
+
+            "message": "Results file not found"
+
+        }
+
+    return FileResponse(
+
+        path=file_path,
+
+        filename=Path(file_path).name,
+
+        media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
 
     )
