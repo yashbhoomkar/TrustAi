@@ -214,365 +214,265 @@ export default function Datasets() {
 
     return (
 
+<div className="datasets-page">
+
+    <div className="page-header">
+
         <div>
 
-            <h1>
+            <h1>Datasets</h1>
 
-                Datasets
+            <p>
+                Upload datasets and configure column mappings for evaluation.
+            </p>
 
-            </h1>
+        </div>
 
-            <hr/>
+    </div>
 
-            <h3>
+    <div className="upload-card">
 
-                Upload Dataset
+        <h2>Upload Dataset</h2>
 
-            </h3>
+        <div className="upload-grid">
 
-            <input
-                placeholder="Display Name"
-                value={displayName}
-                onChange={(e)=>
-                    setDisplayName(
-                        e.target.value
-                    )
+            <div className="field">
+
+                <label>Display Name</label>
+
+                <input
+                    type="text"
+                    placeholder="Example: SQL Evaluation Dataset"
+                    value={displayName}
+                    onChange={(e) =>
+                        setDisplayName(e.target.value)
+                    }
+                />
+
+            </div>
+
+            <div className="field">
+
+                <label>Excel File</label>
+
+                <input
+                    type="file"
+                    accept=".xlsx"
+                    onChange={(e) => {
+
+                        if (e.target.files) {
+
+                            setFile(
+                                e.target.files[0]
+                            );
+
+                        }
+
+                    }}
+                />
+
+            </div>
+
+        </div>
+
+        <button
+            className="primary-button"
+            onClick={handleUpload}
+        >
+            Upload Dataset
+        </button>
+
+    </div>
+
+    <div className="datasets-card">
+
+        <div className="card-header">
+
+            <h2>Your Datasets</h2>
+
+            <span>
+
+                {datasets.length} Dataset(s)
+
+            </span>
+
+        </div>
+
+        <table className="modern-table">
+
+            <thead>
+
+                <tr>
+
+                    <th>Name</th>
+
+                    <th>Status</th>
+
+                    <th>Rows</th>
+
+                    <th>Columns</th>
+
+                    <th>Actions</th>
+
+                </tr>
+
+            </thead>
+
+            <tbody>
+
+                {
+
+                    datasets.map((dataset) => (
+
+                        <tr key={dataset.id}>
+
+                            <td>
+
+                                <div>
+
+                                    <strong>
+
+                                        {dataset.display_name}
+
+                                    </strong>
+
+                                    <br />
+
+                                    <small>
+
+                                        {dataset.original_filename}
+
+                                    </small>
+
+                                </div>
+
+                            </td>
+
+                            <td>
+
+                                <span className="status-badge">
+
+                                    {dataset.status}
+
+                                </span>
+
+                            </td>
+
+                            <td>
+
+                                {dataset.rows}
+
+                            </td>
+
+                            <td>
+
+                                {dataset.columns}
+
+                            </td>
+
+                            <td>
+
+                                <div className="action-buttons">
+
+                                    <button
+
+                                        className="secondary-button"
+
+                                        onClick={() =>
+                                            handlePreview(dataset.id)
+                                        }
+
+                                    >
+
+                                        Preview
+
+                                    </button>
+
+                                    <button
+
+                                        className="danger-button"
+
+                                        onClick={() =>
+                                            handleDelete(dataset.id)
+                                        }
+
+                                    >
+
+                                        Delete
+
+                                    </button>
+
+                                </div>
+
+                            </td>
+
+                        </tr>
+
+                    ))
+
                 }
-            />
 
-            <br/><br/>
+            </tbody>
 
-            <input
-                type="file"
-                accept=".xlsx"
-                onChange={(e)=>{
+        </table>
 
-                    if(
-                        e.target.files
-                    ){
+    </div>
 
-                        setFile(
-                            e.target.files[0]
-                        );
-
-                    }
-
-                }}
-            />
-
-            <br/><br/>
-
-            <button
-                onClick={handleUpload}
-            >
-
-                Upload
-
-            </button>
-
-            <hr/>
-
-            <h3>
-
-                Uploaded Datasets
-
-            </h3>
-
-            <table
-                border={1}
-                cellPadding={8}
-            >
-
-                <thead>
-
-                    <tr>
-
-                        <th>ID</th>
-
-                        <th>Name</th>
-
-                        <th>File</th>
-
-                        <th>Status</th>
-
-                        <th>Rows</th>
-
-                        <th>Columns</th>
-
-                        <th>Delete</th>
-
-                    </tr>
-
-                </thead>
-
-                <tbody>
-
-                    {
-
-                        datasets.map(
-
-                            (dataset)=>(
-
-                                <tr
-                                    key={
-                                        dataset.id
-                                    }
-                                >
-
-                                    <td>
-
-                                        {
-                                            dataset.id
-                                        }
-
-                                    </td>
-
-                                    <td>
-
-                                        <button
-
-                                            onClick={()=>
-                                                handlePreview(
-                                                    dataset.id
-                                                )
-                                            }
-
-                                        >
-
-                                            {
-                                                dataset.display_name
-                                            }
-
-                                        </button>
-
-                                    </td>
-
-                                    <td>
-
-                                        {
-                                            dataset.original_filename
-                                        }
-
-                                    </td>
-
-                                    <td>
-
-                                        {
-                                            dataset.status
-                                        }
-
-                                    </td>
-
-                                    <td>
-
-                                        {
-                                            dataset.rows
-                                        }
-
-                                    </td>
-
-                                    <td>
-
-                                        {
-                                            dataset.columns
-                                        }
-
-                                    </td>
-
-                                    <td>
-
-                                        <button
-
-                                            onClick={()=>
-                                                handleDelete(
-                                                    dataset.id
-                                                )
-                                            }
-
-                                        >
-
-                                            Delete
-
-                                        </button>
-
-                                    </td>
-
-                                </tr>
-
-                            )
-
-                        )
-
-                    }
-
-                </tbody>
-
-            </table>
-
-            {
-
+            
+     {      
     preview && (
 
-        <>
+        <div className="preview-card">
 
-            <hr/>
+            <div className="card-header">
 
-            <h2>
+                <h2>Dataset Preview</h2>
 
-                Dataset Preview
+                <span>
 
-            </h2>
+                    {preview.rows.length} Sample Rows
 
-            <h3>
+                </span>
 
-                Column Mapping
+            </div>
 
-            </h3>
+            <div className="mapping-card">
 
-            <table
-                border={1}
-                cellPadding={8}
-            >
+                <h3>
 
-                <thead>
+                    Column Mapping
 
-                    <tr>
+                </h3>
 
-                        <th>
+                <p>
 
-                            Dataset Column
+                    Map your dataset columns to the fields used by TrustAI.
 
-                        </th>
+                </p>
 
-                        <th>
+                <table className="modern-table">
 
-                            TrustAI Role
+                    <thead>
 
-                        </th>
+                        <tr>
 
-                    </tr>
+                            <th>
 
-                </thead>
+                                Dataset Column
 
-                <tbody>
+                            </th>
 
-                    {
+                            <th>
 
-                        preview.columns.map(
+                                TrustAI Role
 
-                            (
+                            </th>
 
-                                column: string,
+                        </tr>
 
-                                index: number
+                    </thead>
 
-                            )=>(
-
-                                <tr
-                                    key={index}
-                                >
-
-                                    <td>
-
-                                        {column}
-
-                                    </td>
-
-                                    <td>
-
-                                        <select
-
-                                            value={
-                                                Object.keys(mapping).find(
-
-                                                    role => mapping[role] === column
-
-                                                ) ?? ""
-
-                                            }
-
-                                            onChange={(e)=>
-
-                                                updateMapping(
-
-                                                    column,
-
-                                                    e.target.value
-
-                                                )
-
-                                            }
-
-                                        >
-
-                                            <option value="">
-
-                                                Not Used
-
-                                            </option>
-
-                                            <option value="User Prompt">
-
-                                                User Prompt
-
-                                            </option>
-
-                                            <option value="Expected Response">
-
-                                                Expected Response
-
-                                            </option>
-
-                                            <option value="LLM Response">
-
-                                                LLM Response
-
-                                            </option>
-
-                                        </select>
-
-                                    </td>
-
-                                </tr>
-
-                            )
-
-                        )
-
-                    }
-
-                </tbody>
-
-            </table>
-
-            <br/>
-
-            <button
-
-                onClick={handleSaveMapping}
-
-            >
-
-                Save Column Mapping
-
-            </button>
-
-            <hr/>
-
-            <h3>
-
-                Preview
-
-            </h3>
-
-            <table
-                border={1}
-                cellPadding={6}
-            >
-
-                <thead>
-
-                    <tr>
+                    <tbody>
 
                         {
 
@@ -584,15 +484,79 @@ export default function Datasets() {
 
                                     index: number
 
-                                )=>(
+                                ) => (
 
-                                    <th
-                                        key={index}
-                                    >
+                                    <tr key={index}>
 
-                                        {column}
+                                        <td>
 
-                                    </th>
+                                            <strong>
+
+                                                {column}
+
+                                            </strong>
+
+                                        </td>
+
+                                        <td>
+
+                                            <select
+
+                                                value={
+
+                                                    Object.keys(mapping).find(
+
+                                                        role =>
+
+                                                            mapping[role] === column
+
+                                                    ) ?? ""
+
+                                                }
+
+                                                onChange={(e) =>
+
+                                                    updateMapping(
+
+                                                        column,
+
+                                                        e.target.value
+
+                                                    )
+
+                                                }
+
+                                            >
+
+                                                <option value="">
+
+                                                    Not Used
+
+                                                </option>
+
+                                                <option value="User Prompt">
+
+                                                    User Prompt
+
+                                                </option>
+
+                                                <option value="Expected Response">
+
+                                                    Expected Response
+
+                                                </option>
+
+                                                <option value="LLM Response">
+
+                                                    LLM Response
+
+                                                </option>
+
+                                            </select>
+
+                                        </td>
+
+                                    </tr>
 
                                 )
 
@@ -600,88 +564,140 @@ export default function Datasets() {
 
                         }
 
-                    </tr>
+                    </tbody>
 
-                </thead>
+                </table>
 
-                <tbody>
+                <button
 
-                    {
+                    className="primary-button"
 
-                        preview.rows.map(
+                    onClick={handleSaveMapping}
 
-                            (
+                >
 
-                                row: any[],
+                    Save Mapping
 
-                                rowIndex: number
+                </button>
 
-                            )=>(
+            </div>
 
-                                <tr
-                                    key={rowIndex}
-                                >
+            <div className="table-card">
 
-                                    {
+                <h3>
 
-                                        row.map(
+                    Data Preview
 
-                                            (
+                </h3>
 
-                                                cell,
+                <div className="table-wrapper">
 
-                                                cellIndex
+                    <table className="modern-table">
 
-                                            )=>(
+                        <thead>
 
-                                                <td
-                                                    key={cellIndex}
-                                                >
+                            <tr>
 
-                                                    {
+                                {
 
-                                                        cell === null
+                                    preview.columns.map(
 
-                                                        ?
+                                        (
 
-                                                        ""
+                                            column: string,
 
-                                                        :
+                                            index: number
 
-                                                        String(cell)
+                                        ) => (
 
-                                                    }
+                                            <th key={index}>
 
-                                                </td>
+                                                {column}
 
-                                            )
+                                            </th>
 
                                         )
 
-                                    }
+                                    )
 
-                                </tr>
+                                }
 
-                            )
+                            </tr>
 
-                        )
+                        </thead>
 
-                    }
+                        <tbody>
 
-                </tbody>
+                            {
 
-            </table>
+                                preview.rows.map(
 
-        </>
+                                    (
 
-    )
+                                        row: any[],
 
-}
+                                        rowIndex: number
 
-                            
+                                    ) => (
+
+                                        <tr key={rowIndex}>
+
+                                            {
+
+                                                row.map(
+
+                                                    (
+
+                                                        cell,
+
+                                                        cellIndex
+
+                                                    ) => (
+
+                                                        <td key={cellIndex}>
+
+                                                            {
+
+                                                                cell == null
+
+                                                                    ? ""
+
+                                                                    : String(cell)
+
+                                                            }
+
+                                                        </td>
+
+                                                    )
+
+                                                )
+
+                                            }
+
+                                        </tr>
+
+                                    )
+
+                                )
+
+                            }
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
 
         </div>
 
-    );
+    )
+}
+
+</div>
+
+);
+
 
 }

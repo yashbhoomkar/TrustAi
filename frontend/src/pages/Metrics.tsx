@@ -1,3 +1,5 @@
+import "../pages/Metrics.css";
+
 import { useEffect, useState } from "react";
 
 import {
