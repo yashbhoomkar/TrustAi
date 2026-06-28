@@ -112,127 +112,177 @@ export default function Settings() {
 
     return (
 
-        <div>
+    <div className="metrics-page">
 
-            <h1>
+        <div className="page-header">
 
-                Settings
+            <div>
 
-            </h1>
+                <h1>
 
-            <h3>
+                    Settings
 
-                API Keys
+                </h1>
 
-            </h3>
+                <p>
 
-            <br/>
+                    Manage your LLM providers and API keys.
 
-            <select
+                </p>
 
-                value={provider}
+            </div>
 
-                onChange={(e)=>
+        </div>
 
-                    setProvider(
-                        e.target.value
-                    )
+        <div className="metric-form-card">
 
-                }
+            <div className="card-header">
 
-            >
+                <h2>
 
-                <option value="">
+                    Add API Key
 
-                    Select Provider
+                </h2>
 
-                </option>
+            </div>
 
-                <option value="openai">
+            <div className="form-grid">
 
-                    OpenAI
+                <div className="field">
 
-                </option>
+                    <label>
 
-                <option value="gemini">
+                        Provider
 
-                    Gemini
+                    </label>
 
-                </option>
+                    <select
 
-                <option value="anthropic">
+                        value={provider}
 
-                    Anthropic
+                        onChange={(e) =>
 
-                </option>
+                            setProvider(
 
-                <option value="groq">
+                                e.target.value
 
-                    Groq
+                            )
 
-                </option>
+                        }
 
-                <option value="ollama">
+                    >
 
-                    Ollama
+                        <option value="">
 
-                </option>
+                            Select Provider
 
-                <option value="openrouter">
+                        </option>
 
-                    OpenRouter
+                        <option value="openai">
 
-                </option>
+                            OpenAI
 
-            </select>
+                        </option>
 
-            <br/>
+                        <option value="gemini">
 
-            <br/>
+                            Gemini
 
-            <input
+                        </option>
 
-                placeholder="Display Name"
+                        <option value="anthropic">
 
-                value={displayName}
+                            Anthropic
 
-                onChange={(e)=>
+                        </option>
 
-                    setDisplayName(
-                        e.target.value
-                    )
+                        <option value="groq">
 
-                }
+                            Groq
 
-            />
+                        </option>
 
-            <br/>
+                        <option value="ollama">
 
-            <br/>
+                            Ollama
 
-            <input
+                        </option>
 
-                type="password"
+                        <option value="openrouter">
 
-                placeholder="API Key"
+                            OpenRouter
 
-                value={apiKey}
+                        </option>
 
-                onChange={(e)=>
+                    </select>
 
-                    setApiKey(
-                        e.target.value
-                    )
+                </div>
 
-                }
+                <div className="field">
 
-            />
+                    <label>
 
-            <br/>
+                        Display Name
 
-            <br/>
+                    </label>
+
+                    <input
+
+                        type="text"
+
+                        placeholder="Example: GPT-4 Production"
+
+                        value={displayName}
+
+                        onChange={(e) =>
+
+                            setDisplayName(
+
+                                e.target.value
+
+                            )
+
+                        }
+
+                    />
+
+                </div>
+
+                <div className="field full-width">
+
+                    <label>
+
+                        API Key
+
+                    </label>
+
+                    <input
+
+                        type="password"
+
+                        placeholder="Paste your API Key"
+
+                        value={apiKey}
+
+                        onChange={(e) =>
+
+                            setApiKey(
+
+                                e.target.value
+
+                            )
+
+                        }
+
+                    />
+
+                </div>
+
+            </div>
 
             <button
+
+                className="primary-button"
 
                 onClick={handleAdd}
 
@@ -242,25 +292,31 @@ export default function Settings() {
 
             </button>
 
-            <hr/>
+        </div>
 
-            <table
+        <div className="metrics-card">
 
-                border={1}
+            <div className="card-header">
 
-                cellPadding={8}
+                <h2>
 
-            >
+                    Saved API Keys
+
+                </h2>
+
+                <span>
+
+                    {keys.length} Keys
+
+                </span>
+
+            </div>
+
+            <table className="modern-table">
 
                 <thead>
 
                     <tr>
-
-                        <th>
-
-                            ID
-
-                        </th>
 
                         <th>
 
@@ -282,7 +338,7 @@ export default function Settings() {
 
                         <th>
 
-                            Delete
+                            Action
 
                         </th>
 
@@ -290,81 +346,105 @@ export default function Settings() {
 
                 </thead>
 
-                <tbody>
-
-                    {
+                <tbody>                    {
 
                         keys.length === 0
 
                         ?
 
-                        <tr>
+                        (
 
-                            <td
-                                colSpan={5}
-                            >
+                            <tr>
 
-                                No API Keys Added
+                                <td
 
-                            </td>
+                                    colSpan={4}
 
-                        </tr>
+                                    style={{
 
-                        :
+                                        textAlign: "center",
 
-                        keys.map((key)=>(
+                                        padding: "30px"
 
-                            <tr
-                                key={key.id}
-                            >
+                                    }}
 
-                                <td>
+                                >
 
-                                    {key.id}
-
-                                </td>
-
-                                <td>
-
-                                    {key.provider}
-
-                                </td>
-
-                                <td>
-
-                                    {key.display_name}
-
-                                </td>
-
-                                <td>
-
-                                    {key.masked_key}
-
-                                </td>
-
-                                <td>
-
-                                    <button
-
-                                        onClick={()=>
-
-                                            handleDelete(
-                                                key.id
-                                            )
-
-                                        }
-
-                                    >
-
-                                        Delete
-
-                                    </button>
+                                    No API Keys Added
 
                                 </td>
 
                             </tr>
 
-                        ))
+                        )
+
+                        :
+
+                        (
+
+                            keys.map((key) => (
+
+                                <tr key={key.id}>
+
+                                    <td>
+
+                                        <span className="badge badge-blue">
+
+                                            {key.provider}
+
+                                        </span>
+
+                                    </td>
+
+                                    <td>
+
+                                        <strong>
+
+                                            {key.display_name}
+
+                                        </strong>
+
+                                    </td>
+
+                                    <td>
+
+                                        <code>
+
+                                            {key.masked_key}
+
+                                        </code>
+
+                                    </td>
+
+                                    <td>
+
+                                        <button
+
+                                            className="danger-button"
+
+                                            onClick={() =>
+
+                                                handleDelete(
+
+                                                    key.id
+
+                                                )
+
+                                            }
+
+                                        >
+
+                                            Delete
+
+                                        </button>
+
+                                    </td>
+
+                                </tr>
+
+                            ))
+
+                        )
 
                     }
 
@@ -374,6 +454,8 @@ export default function Settings() {
 
         </div>
 
-    );
+    </div>
+
+);
 
 }
