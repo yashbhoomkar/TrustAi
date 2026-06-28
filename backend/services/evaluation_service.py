@@ -1,6 +1,7 @@
 import json
 import logging
 import shutil
+from statistics import mean
 
 from pathlib import Path
 
@@ -987,6 +988,203 @@ def download_evaluation(
             results_file
 
         )
+
+    finally:
+
+        db.close()
+
+
+###########################################################
+# Get Evaluation Report
+###########################################################
+
+def get_evaluation_report(
+
+    user_id: int,
+
+    evaluation_id: int
+
+):
+
+    db = SessionLocal()
+
+    try:
+
+        ###################################################
+        # Load Evaluation
+        ###################################################
+
+        evaluation = get_evaluation(
+
+            db,
+
+            user_id,
+
+            evaluation_id
+
+        )
+
+        if evaluation is None:
+
+            return {
+
+                "status": "error",
+
+                "message": "Evaluation not found"
+
+            }
+
+        ###################################################
+        # Load Dataset
+        ###################################################
+
+        dataset = get_dataset(
+
+            db,
+
+            user_id,
+
+            evaluation.dataset_id
+
+        )
+
+        ###################################################
+        # Load Workbook
+        ###################################################
+
+        workbook = load_workbook(
+
+            evaluation.results_path,
+
+            data_only=True
+
+        )
+
+        worksheet = workbook.active
+
+        rows = list(
+
+            worksheet.iter_rows(
+
+                values_only=True
+
+            )
+
+        )
+
+        headers = [
+
+            "" if h is None else str(h)
+
+            for h in rows[0]
+
+        ]
+
+        ###################################################
+        # Compute Metric Averages
+        ###################################################
+
+        metric_averages = {}
+
+        best_metric = None
+
+        worst_metric = None
+
+        for metric in evaluation.metrics:
+
+            score_column = f"{metric['title']} Score"
+
+            if score_column not in headers:
+
+                continue
+
+            column_index = headers.index(score_column)
+
+            scores = []
+
+            for row in rows[1:]:
+
+                value = row[column_index]
+
+                if isinstance(value, (int, float)):
+
+                    scores.append(float(value))
+
+            average = round(mean(scores), 2) if scores else 0
+
+            metric_averages[metric["title"]] = average
+
+        workbook.close()
+
+        ###################################################
+        # Best / Worst Metric
+        ###################################################
+
+        if metric_averages:
+
+            best_name = max(
+
+                metric_averages,
+
+                key=metric_averages.get
+
+            )
+
+            worst_name = min(
+
+                metric_averages,
+
+                key=metric_averages.get
+
+            )
+
+            best_metric = {
+
+                "title": best_name,
+
+                "average": metric_averages[best_name]
+
+            }
+
+            worst_metric = {
+
+                "title": worst_name,
+
+                "average": metric_averages[worst_name]
+
+            }
+
+        ###################################################
+        # Response
+        ###################################################
+
+        return {
+
+            "evaluation_name": evaluation.evaluation_name,
+
+            "dataset_name": dataset.display_name,
+
+            "status": evaluation.status,
+
+            "rows": evaluation.total_rows,
+
+            "selected_metrics": [
+
+                metric["title"]
+
+                for metric in evaluation.metrics
+
+            ],
+
+            "metric_averages": metric_averages,
+
+            "best_metric": best_metric,
+
+            "worst_metric": worst_metric,
+
+            "created_at": str(evaluation.created_at)
+
+        }
 
     finally:
 

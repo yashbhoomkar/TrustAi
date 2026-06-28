@@ -105,3 +105,23 @@ export const downloadEvaluation = async (id: number) => {
 
     return response.data;
 };
+
+///////////////////////////////////////////////////////////
+// Evaluation Report
+///////////////////////////////////////////////////////////
+
+export async function getEvaluationReport(
+
+    evaluationId: number
+
+) {
+
+    const response = await api.get(
+
+        `/evaluations/${evaluationId}/report`
+
+    );
+
+    return response.data;
+
+}

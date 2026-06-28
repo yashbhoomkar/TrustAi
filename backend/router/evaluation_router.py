@@ -28,7 +28,9 @@ from services.evaluation_service import (
 
     download_evaluation,
 
-    remove_evaluation
+    remove_evaluation,
+
+    get_evaluation_report
 
 )
 
@@ -235,5 +237,31 @@ async def download_evaluation_endpoint(
         filename=Path(file_path).name,
 
         media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+
+    )
+
+
+###########################################################
+# Get Evaluation Report
+###########################################################
+
+@evaluation_router.get("/{evaluation_id}/report")
+async def get_evaluation_report_endpoint(
+
+    evaluation_id: int,
+
+    current_user = Depends(
+
+        get_current_user
+
+    )
+
+):
+
+    return get_evaluation_report(
+
+        current_user.id,
+
+        evaluation_id
 
     )
