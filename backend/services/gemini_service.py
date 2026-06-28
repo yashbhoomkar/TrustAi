@@ -220,6 +220,17 @@ Do not return explanations.
 Return ONLY JSON.
 """
 
+#    ###########################################################
+#     # Print Prompt
+#     ###########################################################
+
+#     print("\n" + "=" * 100)
+#     print("PROMPT SENT TO LLM")
+#     print("=" * 100)
+#     print(prompt)
+#     print("=" * 100 + "\n")
+
+
     ###########################################################
     # Try Gemini
     ###########################################################
@@ -231,26 +242,41 @@ Return ONLY JSON.
         )
 
         response = client.models.generate_content(
-
             model=GEMINI_MODEL,
-
             contents=prompt
-
         )
 
-        return parse_json(
+        print("\n" + "=" * 100)
+        print("RAW GEMINI RESPONSE")
+        print("=" * 100)
+        print(response.text)
+        print("=" * 100 + "\n")
 
+        parsed = parse_json(
             response.text
-
         )
+
+        print("\n" + "=" * 100)
+        print("PARSED GEMINI JSON")
+        print("=" * 100)
+        print(parsed)
+        print("=" * 100 + "\n")
+
+        return parsed
 
     except Exception as gemini_error:
 
+        print("\n" + "=" * 100)
+        print("GEMINI ERROR")
+        print("=" * 100)
+        print(type(gemini_error).__name__)
+        print(gemini_error)
+        print("=" * 100 + "\n")
+
         logger.warning(
-
             f"Gemini failed: {gemini_error}"
-
         )
+
 
     ###########################################################
     # Try Ollama
@@ -263,37 +289,59 @@ Return ONLY JSON.
         )
 
         ollama_response = ask_llm(
-
             prompt
-
         )
 
-        return parse_json(
+        print("\n" + "=" * 100)
+        print("RAW OLLAMA RESPONSE")
+        print("=" * 100)
+        print(ollama_response)
+        print("=" * 100 + "\n")
 
+        parsed = parse_json(
             ollama_response
-
         )
+
+        print("\n" + "=" * 100)
+        print("PARSED OLLAMA JSON")
+        print("=" * 100)
+        print(parsed)
+        print("=" * 100 + "\n")
+
+        return parsed
 
     except Exception as ollama_error:
 
+        print("\n" + "=" * 100)
+        print("OLLAMA ERROR")
+        print("=" * 100)
+        print(type(ollama_error).__name__)
+        print(ollama_error)
+        print("=" * 100 + "\n")
+
         logger.warning(
-
             f"Ollama failed: {ollama_error}"
-
         )
+
 
     ###########################################################
     # Mock Response
     ###########################################################
 
-    logger.warning(
+    print("\n" + "=" * 100)
+    print("USING MOCK RESPONSE")
+    print("=" * 100)
 
-        "Returning mock response."
-
-    )
-
-    return build_mock_response(
-
+    mock = build_mock_response(
         metrics
-
     )
+
+    print(mock)
+
+    print("=" * 100 + "\n")
+
+    logger.warning(
+        "Returning mock response."
+    )
+
+    return mock
