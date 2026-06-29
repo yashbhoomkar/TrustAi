@@ -271,169 +271,215 @@ export default function Evaluations() {
 
     return (
 
-        <div>
+    <div className="metrics-page">
 
-            <h1>
+        <div className="page-header">
 
-                Evaluations
+            <div>
 
-            </h1>
+                <h1>
 
-            <hr/>
+                    Evaluations
 
-            <h3>
+                </h1>
 
-                Create Evaluation
+                <p>
 
-            </h3>
+                    Run evaluations on your datasets using custom metrics.
 
-            <input
+                </p>
 
-                placeholder="Evaluation Name"
+            </div>
 
-                value={evaluationName}
+        </div>
 
-                onChange={(e)=>
+        <div className="metric-form-card">
 
-                    setEvaluationName(
+            <div className="card-header">
 
-                        e.target.value
+                <h2>
 
-                    )
+                    Create Evaluation
 
-                }
+                </h2>
 
-            />
+            </div>
 
-            <br/><br/>
+            <div className="form-grid">
 
-            <select
+                <div className="field">
 
-                value={datasetId}
+                    <label>
 
-                onChange={(e)=>
+                        Evaluation Name
 
-                    setDatasetId(
+                    </label>
 
-                        Number(
+                    <input
 
-                            e.target.value
+                        type="text"
 
-                        )
+                        placeholder="Example: GPT-4 SQL Benchmark"
 
-                    )
+                        value={evaluationName}
 
-                }
+                        onChange={(e) =>
 
-            >
+                            setEvaluationName(
 
-                <option value={0}>
+                                e.target.value
 
-                    Select Dataset
+                            )
 
-                </option>
+                        }
 
-                {
+                    />
 
-                    datasets.map(
+                </div>
 
-                        dataset=>(
+                <div className="field">
 
-                            <option
+                    <label>
 
-                                key={dataset.id}
+                        Dataset
 
-                                value={dataset.id}
+                    </label>
 
-                            >
+                    <select
 
-                                {
+                        value={datasetId}
 
-                                    dataset.display_name
+                        onChange={(e) =>
 
-                                }
+                            setDatasetId(
 
-                            </option>
+                                Number(
 
-                        )
+                                    e.target.value
 
-                    )
+                                )
 
-                }
+                            )
 
-            </select>
+                        }
 
-            <br/><br/>
+                    >
 
-            <b>
+                        <option value={0}>
 
-                Select Metrics
+                            Select Dataset
 
-            </b>
+                        </option>
 
-            <br/><br/>
+                        {
 
-            {
+                            datasets.map(
 
-                metrics.map(
+                                (dataset) => (
 
-                    metric=>(
+                                    <option
 
-                        <div
+                                        key={dataset.id}
 
-                            key={metric.id}
+                                        value={dataset.id}
 
-                        >
+                                    >
 
-                            <label>
+                                        {
 
-                                <input
+                                            dataset.display_name
 
-                                    type="checkbox"
+                                        }
 
-                                    checked={
+                                    </option>
 
-                                        selectedMetrics.includes(
+                                )
 
-                                            metric.id
+                            )
 
-                                        )
+                        }
 
-                                    }
+                    </select>
 
-                                    onChange={()=>
+                </div>
 
-                                        toggleMetric(
+                <div className="field full-width">
 
-                                            metric.id
+                    <label>
 
-                                        )
+                        Select Metrics
 
-                                    }
+                    </label>
 
-                                />
+                    <div className="metrics-checkbox-grid">
 
-                                {" "}
+                        {
 
-                                {
+                            metrics.map(
 
-                                    metric.title
+                                (metric) => (
 
-                                }
+                                    <label
 
-                            </label>
+                                        key={metric.id}
 
-                        </div>
+                                        className="metric-checkbox"
 
-                    )
+                                    >
 
-                )
+                                        <input
 
-            }
+                                            type="checkbox"
 
-            <br/>
+                                            checked={
+
+                                                selectedMetrics.includes(
+
+                                                    metric.id
+
+                                                )
+
+                                            }
+
+                                            onChange={() =>
+
+                                                toggleMetric(
+
+                                                    metric.id
+
+                                                )
+
+                                            }
+
+                                        />
+
+                                        <span>
+
+                                            {
+
+                                                metric.title
+
+                                            }
+
+                                        </span>
+
+                                    </label>
+
+                                )
+
+                            )
+
+                        }
+
+                    </div>
+
+                </div>
+
+            </div>
 
             <button
+
+                className="primary-button"
 
                 onClick={handleCreate}
 
@@ -443,85 +489,100 @@ export default function Evaluations() {
 
             </button>
 
-            <hr/>
+        </div>
 
-            <h2>
+        <div className="metrics-card">
 
-                Previous Evaluations
+            <div className="card-header">
 
-            </h2>
+                <h2>
 
-            <table
+                    Previous Evaluations
 
-                border={1}
+                </h2>
 
-                cellPadding={8}
+                <span>
 
-            >
+                    {
+
+                        evaluations.length
+
+                    }
+
+                    {" "}Evaluations
+
+                </span>
+
+            </div>
+
+            <table className="modern-table">
 
                 <thead>
 
                     <tr>
 
-                        <th>ID</th>
+                        <th>
 
-                        <th>Name</th>
+                            Name
 
-                        <th>Status</th>
+                        </th>
 
-                        <th>Progress</th>
+                        <th>
 
-                        <th>View</th>
+                            Status
 
-                        <th>Download</th>
+                        </th>
 
-                        <th>Delete</th>
+                        <th>
+
+                            Progress
+
+                        </th>
+
+                        <th>
+
+                            Actions
+
+                        </th>
 
                     </tr>
 
                 </thead>
 
                 <tbody>
-
-                    {
+                                        {
 
                         evaluations.map(
 
-                            evaluation=>(
+                            (evaluation) => (
 
-                                <tr
-
-                                    key={evaluation.id}
-
-                                >
+                                <tr key={evaluation.id}>
 
                                     <td>
 
-                                        {
+                                        <strong>
 
-                                            evaluation.id
+                                            {
 
-                                        }
+                                                evaluation.evaluation_name
+
+                                            }
+
+                                        </strong>
 
                                     </td>
 
                                     <td>
 
-                                        {
+                                        <span className="badge badge-green">
 
-                                            evaluation.evaluation_name
+                                            {
 
-                                        }
+                                                evaluation.status
 
-                                    </td>
+                                            }
 
-                                    <td>
-
-                                        {
-
-                                            evaluation.status
-
-                                        }
+                                        </span>
 
                                     </td>
 
@@ -533,7 +594,7 @@ export default function Evaluations() {
 
                                         }
 
-                                        /
+                                        {" / "}
 
                                         {
 
@@ -545,42 +606,69 @@ export default function Evaluations() {
 
                                     <td>
 
-                                        <button
+                                        <div className="action-buttons">
 
-                                            onClick={()=>
+                                            <button
 
-                                                handleDelete(
+                                                className="secondary-button"
 
-                                                    evaluation.id
+                                                onClick={() =>
 
-                                                )
+                                                    handleViewResults(
 
-                                            }
+                                                        evaluation.id
 
-                                        >
+                                                    )
 
-                                            Delete
+                                                }
 
-                                        </button>
+                                            >
 
-                                    </td>
-                                    <td>
+                                                View
 
-                                        <button
-                                            onClick={() => handleViewResults(evaluation.id)}
-                                        >
-                                            View Results
-                                        </button>
+                                            </button>
 
-                                    </td>
+                                            <button
 
-                                    <td>
+                                                className="primary-button"
 
-                                        <button
-                                            onClick={() => handleDownload(evaluation.id)}
-                                        >
-                                            Download
-                                        </button>
+                                                onClick={() =>
+
+                                                    handleDownload(
+
+                                                        evaluation.id
+
+                                                    )
+
+                                                }
+
+                                            >
+
+                                                Download
+
+                                            </button>
+
+                                            <button
+
+                                                className="danger-button"
+
+                                                onClick={() =>
+
+                                                    handleDelete(
+
+                                                        evaluation.id
+
+                                                    )
+
+                                                }
+
+                                            >
+
+                                                Delete
+
+                                            </button>
+
+                                        </div>
 
                                     </td>
 
@@ -596,102 +684,135 @@ export default function Evaluations() {
 
             </table>
 
-            {
-    selectedEvaluationId !== null && (
+        </div>
+                {
 
-        <>
+            selectedEvaluationId !== null && (
 
-            <hr />
+                <div className="preview-card">
 
-            <h2>
+                    <div className="card-header">
 
-                Evaluation Results
+                        <h2>
 
-            </h2>
+                            Evaluation Results
 
-            <div
-                style={{
-                    overflow: "auto",
-                    maxHeight: "600px",
-                    border: "1px solid #ccc"
-                }}
-            >
+                        </h2>
 
-                <table
-                    border={1}
-                    cellPadding={6}
-                >
-
-                    <thead>
-
-                        <tr>
+                        <span>
 
                             {
 
-                                tableHeaders.map(header => (
-
-                                    <th key={header}>
-
-                                        {header}
-
-                                    </th>
-
-                                ))
+                                tableRows.length
 
                             }
 
-                        </tr>
+                            {" "}Rows
 
-                    </thead>
+                        </span>
 
-                    <tbody>
+                    </div>
 
-                        {
+                    <div className="table-wrapper">
 
-                            tableRows.map((row, index) => (
+                        <table className="modern-table">
 
-                                <tr key={index}>
+                            <thead>
+
+                                <tr>
 
                                     {
 
-                                        row.map((cell, cellIndex) => (
+                                        tableHeaders.map(
 
-                                            <td key={cellIndex}>
+                                            (header) => (
 
-                                                {
+                                                <th key={header}>
 
-                                                    cell === null
-                                                        ? ""
-                                                        : String(cell)
+                                                    {header}
 
-                                                }
+                                                </th>
 
-                                            </td>
+                                            )
 
-                                        ))
+                                        )
 
                                     }
 
                                 </tr>
 
-                            ))
+                            </thead>
 
-                        }
+                            <tbody>
 
-                    </tbody>
+                                {
 
-                </table>
+                                    tableRows.map(
 
-            </div>
+                                        (
 
-        </>
+                                            row,
 
-    )
+                                            rowIndex
+
+                                        ) => (
+
+                                            <tr key={rowIndex}>
+
+                                                {
+
+                                                    row.map(
+
+                                                        (
+
+                                                            cell,
+
+                                                            cellIndex
+
+                                                        ) => (
+
+                                                            <td key={cellIndex}>
+
+                                                                {
+
+                                                                    cell == null
+
+                                                                        ? ""
+
+                                                                        : String(cell)
+
+                                                                }
+
+                                                            </td>
+
+                                                        )
+
+                                                    )
+
+                                                }
+
+                                            </tr>
+
+                                        )
+
+                                    )
+
+                                }
+
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+                </div>
+
+            )
+
+        }
+
+    </div>
+
+);
+
 }
-
-        </div>
-
-    );
-
-}
-

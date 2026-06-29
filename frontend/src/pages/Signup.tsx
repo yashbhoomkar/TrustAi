@@ -1,3 +1,5 @@
+import "./Signup.css";
+
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -36,49 +38,124 @@ export default function Signup() {
 
     return (
 
-        <div>
+    <div className="signup-page">
 
-            <h1>Signup</h1>
+        <div className="signup-card">
 
-            <input
-                placeholder="Email"
-                value={email}
-                onChange={(e)=>
-                    setEmail(e.target.value)
-                }
-            />
+            <div className="signup-header">
 
-            <br/><br/>
+                <h1>
 
-            <input
-                type="password"
-                placeholder="Password"
-                value={password}
-                onChange={(e)=>
-                    setPassword(e.target.value)
-                }
-            />
+                    TrustAI
 
-            <br/><br/>
+                </h1>
+
+                <p>
+
+                    Create your account to start evaluating LLMs
+
+                </p>
+
+            </div>
+
+            <h2>
+
+                Sign Up
+
+            </h2>
+
+            <div className="field">
+
+                <label>
+
+                    Email
+
+                </label>
+
+                <input
+
+                    type="email"
+
+                    placeholder="Enter your email"
+
+                    value={email}
+
+                    onChange={(e) =>
+
+                        setEmail(
+
+                            e.target.value
+
+                        )
+
+                    }
+
+                />
+
+            </div>
+
+            <div className="field">
+
+                <label>
+
+                    Password
+
+                </label>
+
+                <input
+
+                    type="password"
+
+                    placeholder="Create a password"
+
+                    value={password}
+
+                    onChange={(e) =>
+
+                        setPassword(
+
+                            e.target.value
+
+                        )
+
+                    }
+
+                />
+
+            </div>
 
             <button
+
+                className="primary-button"
+
                 onClick={handleSignup}
+
             >
-                Signup
+
+                Create Account
+
             </button>
 
-            <br/><br/>
-
             <button
-                onClick={()=>
+
+                className="secondary-button"
+
+                onClick={() =>
+
                     navigate("/login")
+
                 }
+
             >
-                Login
+
+                Already have an account?
+
             </button>
 
         </div>
 
-    );
+    </div>
+
+);
 
 }

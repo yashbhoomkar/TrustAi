@@ -1,3 +1,5 @@
+import "./Login.css";
+
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -39,49 +41,116 @@ export default function Login() {
 
     return (
 
-        <div>
+    <div className="login-page">
 
-            <h1>Login</h1>
+        <div className="login-card">
 
-            <input
-                placeholder="Email"
-                value={email}
-                onChange={(e)=>
-                    setEmail(e.target.value)
-                }
-            />
+            <div className="login-header">
 
-            <br/><br/>
+                <h1>
 
-            <input
-                type="password"
-                placeholder="Password"
-                value={password}
-                onChange={(e)=>
-                    setPassword(e.target.value)
-                }
-            />
+                    TrustAI
 
-            <br/><br/>
+                </h1>
+
+                <p>
+
+                    Evaluate LLMs with confidence
+
+                </p>
+
+            </div>
+
+            <h2>
+
+                Login
+
+            </h2>
+
+            <div className="field">
+
+                <label>
+
+                    Email
+
+                </label>
+
+                <input
+
+                    type="email"
+
+                    placeholder="Enter your email"
+
+                    value={email}
+
+                    onChange={(e) =>
+
+                        setEmail(e.target.value)
+
+                    }
+
+                />
+
+            </div>
+
+            <div className="field">
+
+                <label>
+
+                    Password
+
+                </label>
+
+                <input
+
+                    type="password"
+
+                    placeholder="Enter your password"
+
+                    value={password}
+
+                    onChange={(e) =>
+
+                        setPassword(e.target.value)
+
+                    }
+
+                />
+
+            </div>
 
             <button
+
+                className="primary-button"
+
                 onClick={handleLogin}
+
             >
+
                 Login
+
             </button>
 
-            <br/><br/>
-
             <button
-                onClick={()=>
+
+                className="secondary-button"
+
+                onClick={() =>
+
                     navigate("/signup")
+
                 }
+
             >
-                Signup
+
+                Create Account
+
             </button>
 
         </div>
 
-    );
+    </div>
+
+);
 
 }
